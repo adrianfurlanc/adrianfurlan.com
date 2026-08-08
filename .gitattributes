@@ -1,0 +1,5 @@
+# npm regenerates this wholesale on every install, so its diff is thousands of
+# lines of noise that nobody reads. Unsetting `diff` makes git report it as
+# "Binary files ... differ" instead. The file is still committed and versioned
+# in full -- this only changes how diffs are displayed.
+package-lock.json -diff

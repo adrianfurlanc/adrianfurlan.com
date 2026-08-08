@@ -1,9 +1,16 @@
 {
-	"extends": "stylelint-config-standard",
-	"overrides": [
-		{
-			"files": ["**/*.astro", "**/*.html"],
-			"customSyntax": "postcss-html"
-		}
-	]
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "color-function-notation": null,
+    "color-function-alias-notation": null,
+    "alpha-value-notation": null,
+    "media-feature-range-notation": null,
+    "property-no-vendor-prefix": null
+  },
+  "overrides": [
+    {
+      "files": ["**/*.astro", "**/*.html"],
+      "customSyntax": "postcss-html"
+    }
+  ]
 }
