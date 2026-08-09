@@ -1,11 +1,11 @@
 {
   "extends": "stylelint-config-standard",
   "rules": {
-    "color-function-notation": null,
-    "color-function-alias-notation": null,
-    "alpha-value-notation": null,
-    "media-feature-range-notation": null,
-    "property-no-vendor-prefix": null
+    "color-named": "never",
+    "declaration-no-important": true,
+    "selector-max-id": 0,
+    "max-nesting-depth": 3,
+    "no-unknown-animations": true
   },
   "overrides": [
     {
