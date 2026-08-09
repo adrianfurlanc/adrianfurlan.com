@@ -9,7 +9,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:css": "stylelint \"src/**/*.{css,astro,html}\"",
+    "lint:css:fix": "stylelint --fix \"src/**/*.{css,astro,html}\""
   },
   "dependencies": {
     "astro": "^7.1.0"
