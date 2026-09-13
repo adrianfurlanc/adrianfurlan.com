@@ -1,0 +1,194 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+---
+
+<Layout title="Contact · Adrián Furlan">
+  <SiteHeader current="contact" />
+  <main class="page">
+    <div class="intro">
+      <h1 class="title">Contact</h1>
+      <p class="lede">
+        For shows, press, or anything else. Replies within a few days.
+      </p>
+    </div>
+    {
+      /* Visual only for now. To wire it up: give the form an action and method
+        (or a form service's endpoint) and change the button to type="submit". */
+    }
+    <form class="form" novalidate>
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea
+          id="message"
+          name="message"
+          placeholder="Shows, press, or anything else."></textarea>
+      </div>
+      <div class="actions">
+        <button class="send" type="button">Send</button>
+      </div>
+    </form>
+  </main>
+  <SiteFooter />
+</Layout>
+
+<style>
+  .page {
+    max-width: 880px;
+    margin: 0 auto 28px;
+    padding: var(--page-margin) var(--page-margin) 0;
+  }
+
+  .intro,
+  .form {
+    max-width: 415px;
+    margin: 0 auto;
+  }
+
+  .intro {
+    text-align: center;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--headline-md-size);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    letter-spacing: var(--headline-md-ls);
+    color: var(--sounding-ink);
+  }
+
+  .lede {
+    margin: 18px 0 28px;
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--body-md-lh);
+    color: var(--sounding-ink);
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    text-align: left;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  label {
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    color: var(--chart-grey);
+  }
+
+  input,
+  textarea {
+    display: block;
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--light-blue);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--on-surface);
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    line-height: 1.4;
+    outline: none;
+    transition: var(--transition-state);
+  }
+
+  textarea {
+    height: 200px;
+    margin-top: 2px;
+    padding: 12px;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  textarea::placeholder {
+    color: var(--chart-grey);
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: var(--deep-water);
+  }
+
+  .actions {
+    padding-top: 10px;
+  }
+
+  .send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: var(--transport-size);
+    padding: 12px var(--space-md);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    background: var(--primary);
+    color: var(--text-on-primary);
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    font-feature-settings: "case" 1;
+    cursor: pointer;
+    transition: var(--transition-state);
+  }
+
+  .send:hover {
+    background: var(--primary-strong);
+  }
+
+  @media (width < 720px) {
+    .page {
+      margin-bottom: 40px;
+      padding: 28px 20px 0;
+    }
+
+    .title {
+      font-size: var(--headline-sm-size);
+      line-height: 1.2;
+      letter-spacing: var(--headline-sm-ls);
+    }
+
+    .lede {
+      margin: 14px 0 24px;
+    }
+
+    .form {
+      gap: var(--space-md);
+    }
+
+    textarea {
+      height: 190px;
+    }
+
+    .actions {
+      padding-top: 20px;
+    }
+  }
+</style>

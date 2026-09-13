@@ -4,6 +4,9 @@
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0;
   background: var(--surface-page);
   color: var(--text-body);
@@ -11,6 +14,11 @@ body {
   font-size: var(--body-md-size);
   line-height: var(--body-md-lh);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Let the page content fill spare height so the footer sits at the bottom on short pages. */
+main {
+  flex: 1;
 }
 
 a {
