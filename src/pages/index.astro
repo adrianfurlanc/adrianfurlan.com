@@ -2,10 +2,180 @@
 import Layout from "../layouts/Layout.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import TrackList from "../components/TrackList.astro";
+import { release, tracks } from "../data/tracks";
+import cover from "../assets/coverart.jpg";
 ---
 
 <Layout>
   <SiteHeader current="home" />
-  <main></main>
+  <main class="page">
+    <section class="hero">
+      <div class="cover">
+        <span class="caption">{release.coverCaption}</span>
+      </div>
+      <p class="label">{release.artist}</p>
+      <h1 class="title">{release.title}</h1>
+      <p class="lede">
+        Four tracks written by Adrián over 20 years ago and recorded in Jaime's
+        home studio over the span of 3 days in October 2025. Adrián only plays
+        the guitar, it is The Fearless who fill the room. Press play on anything
+        below.
+      </p>
+      <p class="release-meta">
+        <span>{release.released}</span>
+        <span aria-hidden="true">·</span>
+        <span>{release.trackCount} tracks</span>
+        <span aria-hidden="true">·</span>
+        <span>{release.runningTime}</span>
+      </p>
+    </section>
+    <TrackList
+      tracks={tracks}
+      year={release.year}
+      coverSrc={cover.src}
+      coverAlt={release.coverCaption}
+      note={release.audioNote}
+    />
+  </main>
   <SiteFooter />
 </Layout>
+
+<style>
+  .page {
+    max-width: 880px;
+    margin: 0 auto 40px;
+    padding: 56px var(--page-margin) 0;
+  }
+
+  /* Cover on the left; label, title, copy, and meta stacked on the right. */
+  .hero {
+    display: grid;
+    grid-template:
+      "cover label" auto
+      "cover title" auto
+      "cover lede" auto
+      "cover meta" auto
+      / 280px 1fr;
+    gap: 0 40px;
+    align-content: center;
+  }
+
+  .cover {
+    grid-area: cover;
+    display: flex;
+    align-items: flex-end;
+    align-self: center;
+    width: 280px;
+    height: 280px;
+    padding: 10px;
+    border: 1px solid var(--light-blue);
+    background: var(--foam);
+    overflow: hidden;
+    transition: transform var(--transition-wash);
+  }
+
+  .caption,
+  .label {
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    color: var(--chart-grey);
+  }
+
+  .label {
+    grid-area: label;
+    margin: 0;
+  }
+
+  .title {
+    grid-area: title;
+    margin: var(--space-md) 0 0;
+    font-family: var(--font-serif);
+    font-size: 52px;
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    letter-spacing: var(--display-ls);
+    white-space: nowrap;
+    color: var(--sounding-ink);
+  }
+
+  .lede {
+    grid-area: lede;
+    max-width: 34em;
+    margin: 22px 0 0;
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--body-md-lh);
+    color: var(--sounding-ink);
+  }
+
+  .release-meta {
+    grid-area: meta;
+    display: flex;
+    gap: 20px;
+    margin: 26px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--light-blue);
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--chart-grey);
+  }
+
+  @media (hover: hover) and (width >= 720px) {
+    .cover:hover {
+      transform: scale(1.015);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cover:hover {
+      transform: none;
+    }
+  }
+
+  @media (width < 720px) {
+    .page {
+      padding: 28px 20px 0;
+    }
+
+    .hero {
+      grid-template:
+        "cover label" auto
+        "cover title" auto
+        "lede lede" auto
+        "meta meta" auto
+        / 120px 1fr;
+      gap: 0 20px;
+    }
+
+    .cover {
+      width: 120px;
+      height: 120px;
+    }
+
+    .title {
+      margin-top: 12px;
+      font-size: var(--headline-sm-size);
+    }
+
+    .lede {
+      margin-top: 22px;
+    }
+
+    .release-meta {
+      gap: 6px;
+      margin-top: 18px;
+      padding-top: 12px;
+    }
+  }
+</style>

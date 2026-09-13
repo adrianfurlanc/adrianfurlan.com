@@ -7,6 +7,10 @@ dist/
 # Claude Design export (~25 MB of reference files)
 claude-design/
 
+# Audio for the homepage player. Kept out of history until release; see
+# public/audio/.gitkeep for the expected filenames.
+public/audio/*.mp3
+
 # dependencies
 node_modules/
 

@@ -1,0 +1,321 @@
+---
+interface Props {
+  num: string;
+  slug: string;
+  title: string;
+  duration: string;
+  year: string;
+  coverSrc: string;
+  coverAlt: string;
+}
+
+const { num, slug, title, duration, year, coverSrc, coverAlt } = Astro.props;
+---
+
+<div class="row" data-track data-state="off" data-duration={duration}>
+  <img class="thumb" src={coverSrc} alt={coverAlt} width="56" height="56" />
+  <div class="body">
+    <div class="title">{title}</div>
+    <div class="meta">
+      <span class="glyph" data-num={num}>{num}</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span class="time">{duration}</span>
+    </div>
+    <div
+      class="seek"
+      role="slider"
+      tabindex="0"
+      aria-label="Seek"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      hidden
+    >
+      <div class="seek-track">
+        <div class="seek-fill"></div>
+        <div class="seek-knob"></div>
+      </div>
+    </div>
+  </div>
+  <span class="year">{year}</span>
+  <button
+    class="transport"
+    type="button"
+    aria-label="Play"
+    aria-pressed="false"
+  >
+    <span class="icon-play"></span>
+    <span class="icon-pause"></span>
+  </button>
+  <audio preload="none" src={`/audio/${slug}.mp3`}></audio>
+</div>
+
+<style>
+  .row {
+    display: grid;
+    grid-template:
+      "thumb glyph title year time transport" auto
+      "thumb glyph seek year time transport" auto
+      / 56px 28px 1fr 64px 56px 44px;
+    gap: 0 var(--space-md);
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light-blue);
+    transition:
+      background-color var(--transition-wash),
+      transform var(--transition-wash);
+  }
+
+  /* Playing and paused rows bleed 16px past the column edges, as in the artboard. */
+  .row[data-state="playing"],
+  .row[data-state="paused"] {
+    position: relative;
+    margin: -1px -16px 0;
+    padding: 12px 16px;
+  }
+
+  .row[data-state="playing"] {
+    background-color: var(--light-blue);
+  }
+
+  .row[data-state="paused"] {
+    background-color: var(--foam);
+  }
+
+  .thumb {
+    grid-area: thumb;
+    display: block;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--light-blue);
+    object-fit: cover;
+  }
+
+  .body,
+  .meta {
+    display: contents;
+  }
+
+  .dot {
+    display: none;
+  }
+
+  .title {
+    grid-area: title;
+    font-family: var(--font-serif);
+    font-size: var(--track-title-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--track-title-lh);
+    color: var(--sounding-ink);
+  }
+
+  .glyph,
+  .year {
+    font-family: var(--font-sans);
+    font-size: var(--data-catalog-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--data-catalog-lh);
+    letter-spacing: var(--data-catalog-ls);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .glyph {
+    grid-area: glyph;
+    color: var(--sounding-ink);
+  }
+
+  .year {
+    grid-area: year;
+    color: var(--chart-grey);
+  }
+
+  .row[data-state="playing"] .year,
+  .row[data-state="paused"] .year {
+    color: var(--sounding-ink);
+  }
+
+  .time {
+    grid-area: time;
+    font-family: var(--font-sans);
+    font-size: var(--data-time-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--data-time-lh);
+    letter-spacing: var(--data-time-ls);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--sounding-ink);
+  }
+
+  /* Seek bar: a 2px rule whose filled part and knob follow --progress. */
+  .seek {
+    grid-area: seek;
+    margin-top: var(--space-xs);
+    padding: 6px 0;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .seek[hidden] {
+    display: none;
+  }
+
+  .seek-track {
+    position: relative;
+    height: var(--scrubber-height);
+    background: var(--sleeve);
+  }
+
+  .seek-fill {
+    width: var(--progress, 0%);
+    height: var(--scrubber-height);
+    background: var(--deep-water);
+  }
+
+  .seek-knob {
+    position: absolute;
+    top: -4px;
+    left: var(--progress, 0%);
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border-radius: var(--radius-full);
+    background: var(--deep-water);
+  }
+
+  /* The transport: the site's only round object. */
+  .transport {
+    grid-area: transport;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--transport-size);
+    height: var(--transport-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-transport);
+    background: var(--fill-transport);
+    cursor: pointer;
+    flex: none;
+    transition: background-color var(--transition-state);
+  }
+
+  .transport:hover {
+    background: var(--fill-transport-hover);
+  }
+
+  .icon-play {
+    width: 0;
+    height: 0;
+    margin-left: 3px;
+    border-top: 7.5px solid transparent;
+    border-bottom: 7.5px solid transparent;
+    border-left: 13px solid var(--text-on-primary);
+  }
+
+  .icon-pause {
+    display: flex;
+    gap: 5px;
+  }
+
+  .icon-pause::before,
+  .icon-pause::after {
+    content: "";
+    width: 4px;
+    height: 15px;
+    background: var(--text-on-primary);
+  }
+
+  .transport[aria-pressed="true"] .icon-play,
+  .transport[aria-pressed="false"] .icon-pause {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .row:hover {
+      position: relative;
+      z-index: 1;
+      transform: scale(1.02);
+    }
+
+    .row[data-state="off"]:hover {
+      background-color: var(--foam);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row:hover {
+      transform: none;
+    }
+  }
+
+  @media (width < 720px) {
+    .row {
+      grid-template: "thumb body transport" auto / 44px 1fr 44px;
+      gap: 14px;
+    }
+
+    .row[data-state="playing"],
+    .row[data-state="paused"] {
+      margin: -1px -20px 0;
+      padding: 12px 20px;
+    }
+
+    .thumb {
+      width: 44px;
+      height: 44px;
+    }
+
+    .body {
+      grid-area: body;
+      display: block;
+    }
+
+    .title {
+      font-size: var(--body-lg-size);
+    }
+
+    .meta {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .glyph,
+    .dot,
+    .time {
+      display: inline;
+      font-family: var(--font-sans);
+      font-size: var(--data-catalog-size);
+      font-weight: var(--weight-bold);
+      line-height: var(--data-catalog-lh);
+      letter-spacing: var(--data-catalog-ls);
+      text-align: left;
+      color: var(--chart-grey);
+    }
+
+    .row[data-state="playing"] .glyph,
+    .row[data-state="playing"] .dot,
+    .row[data-state="playing"] .time,
+    .row[data-state="paused"] .glyph,
+    .row[data-state="paused"] .dot,
+    .row[data-state="paused"] .time {
+      color: var(--sounding-ink);
+    }
+
+    .year {
+      display: none;
+    }
+
+    .seek {
+      padding: var(--space-sm) 0;
+    }
+
+    .seek-knob {
+      top: -5px;
+      width: 12px;
+      height: 12px;
+      margin-left: -6px;
+    }
+  }
+</style>
