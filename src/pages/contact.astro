@@ -156,11 +156,25 @@ import SiteFooter from "../components/SiteFooter.astro";
     text-transform: uppercase;
     font-feature-settings: "case" 1;
     cursor: pointer;
-    transition: var(--transition-state);
+    transition:
+      background-color var(--transition-state),
+      transform var(--transition-wash);
   }
 
   .send:hover {
     background: var(--primary-strong);
+  }
+
+  @media (hover: hover) and (width >= 720px) {
+    .send:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .send:hover {
+      transform: none;
+    }
   }
 
   @media (width < 720px) {

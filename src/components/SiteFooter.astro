@@ -193,7 +193,9 @@
     height: var(--transport-size);
     color: var(--sleeve);
     text-decoration: none;
-    transition: color var(--transition-state);
+    transition:
+      color var(--transition-state),
+      transform var(--transition-wash);
   }
 
   /* Hover colours only on devices with a pointer; the artboard disables them on phones. */
@@ -220,6 +222,19 @@
 
     .icon-bluesky:hover {
       color: var(--brand-bluesky);
+    }
+  }
+
+  /* Desktop-only hover motion from the design file; off for reduced motion. */
+  @media (hover: hover) and (width >= 720px) {
+    .icon:hover {
+      transform: scale(1.18);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .icon:hover {
+      transform: none;
     }
   }
 

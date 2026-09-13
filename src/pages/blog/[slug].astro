@@ -154,6 +154,7 @@ const readTime = Math.max(1, Math.ceil(words / 200));
     padding: 10px;
     border: 1px solid var(--light-blue);
     background: var(--foam);
+    transition: transform var(--transition-wash);
   }
 
   .caption,
@@ -288,6 +289,18 @@ const readTime = Math.max(1, Math.ceil(words / 200));
   .arrow {
     margin-right: var(--space-sm);
     flex: none;
+  }
+
+  @media (hover: hover) and (width >= 720px) {
+    .figure:hover {
+      transform: scale(1.015);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .figure:hover {
+      transform: none;
+    }
   }
 
   @media (width < 720px) {

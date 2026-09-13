@@ -40,6 +40,7 @@ const { title, href, date, dateTime, excerpt, caption } = Astro.props;
   .card {
     display: flex;
     flex-direction: column;
+    transition: transform var(--transition-wash);
   }
 
   .figure {
@@ -131,6 +132,20 @@ const { title, href, date, dateTime, excerpt, caption } = Astro.props;
   .arrow {
     margin-left: 8px;
     flex: none;
+  }
+
+  @media (hover: hover) and (width >= 720px) {
+    .card:hover {
+      position: relative;
+      z-index: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover {
+      transform: none;
+    }
   }
 
   @media (width < 720px) {
