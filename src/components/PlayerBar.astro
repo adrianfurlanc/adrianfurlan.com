@@ -1,0 +1,423 @@
+---
+// The persistent player. Rendered once in Layout.astro with transition:persist,
+// so the same element (and its playing <audio>) survives client-side navigation.
+// Hidden until the first track is played; sits in the page flow above the footer.
+---
+
+<div class="player-bar" data-player transition:persist="player" hidden>
+  <div class="inner">
+    <button
+      class="transport"
+      type="button"
+      aria-label="Play"
+      aria-pressed="false"
+    >
+      <span class="icon-play"></span>
+      <span class="icon-pause"></span>
+    </button>
+    <div class="info">
+      <div class="line">
+        <span class="title"
+          ><span class="track-title"></span><span class="release"></span></span
+        >
+        <span class="times">
+          <span class="elapsed">0:00</span>
+          <span class="duration">/ 0:00</span>
+        </span>
+      </div>
+      <div
+        class="scrubber"
+        role="slider"
+        tabindex="0"
+        aria-label="Seek"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div class="scrubber-track"><div class="scrubber-fill"></div></div>
+      </div>
+    </div>
+  </div>
+  <audio preload="none"></audio>
+</div>
+
+<script>
+  // The site's one audio player. It owns the single <audio> element in the
+  // bar, keeps one track playing at a time, and paints both the bar and any
+  // track rows on the current page. Rows are re-bound on every page load
+  // because client-side navigation replaces the page body.
+  interface Track {
+    slug: string;
+    title: string;
+    duration: string;
+    src: string;
+    release: string;
+  }
+
+  const bar = document.querySelector<HTMLElement>("[data-player]");
+
+  if (bar) {
+    const audio = bar.querySelector("audio") as HTMLAudioElement;
+    const button = bar.querySelector(".transport") as HTMLButtonElement;
+    const trackTitle = bar.querySelector(".track-title") as HTMLElement;
+    const releaseEl = bar.querySelector(".release") as HTMLElement;
+    const elapsedEl = bar.querySelector(".elapsed") as HTMLElement;
+    const durationEl = bar.querySelector(".duration") as HTMLElement;
+    const scrubber = bar.querySelector(".scrubber") as HTMLElement;
+
+    let playlist: Track[] = [];
+    let current: Track | null = null;
+
+    const fmt = (seconds: number) => {
+      const s = Math.max(0, Math.floor(seconds));
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    };
+
+    const progressPct = () =>
+      audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+
+    const rows = () => [
+      ...document.querySelectorAll<HTMLElement>("[data-track]"),
+    ];
+
+    const trackFromRow = (row: HTMLElement): Track => ({
+      slug: row.dataset.slug ?? "",
+      title: row.dataset.title ?? "",
+      duration: row.dataset.duration ?? "0:00",
+      src: row.dataset.src ?? "",
+      release: row.dataset.release ?? "",
+    });
+
+    const paintButton = (target: Element, playing: boolean) => {
+      target.setAttribute("aria-pressed", String(playing));
+      target.setAttribute("aria-label", playing ? "Pause" : "Play");
+    };
+
+    const paintBar = () => {
+      if (!current) return;
+      trackTitle.textContent = current.title;
+      releaseEl.textContent = current.release;
+      elapsedEl.textContent = fmt(audio.currentTime);
+      durationEl.textContent = `/ ${current.duration}`;
+      const pct = progressPct();
+      scrubber.style.setProperty("--progress", `${pct}%`);
+      scrubber.setAttribute("aria-valuenow", String(Math.round(pct)));
+      paintButton(button, !audio.paused);
+    };
+
+    const resetRow = (row: HTMLElement) => {
+      const glyph = row.querySelector(".glyph") as HTMLElement;
+      const time = row.querySelector(".time") as HTMLElement;
+      const seek = row.querySelector(".seek") as HTMLElement;
+      row.dataset.state = "off";
+      glyph.textContent = glyph.dataset.num ?? "";
+      time.textContent = row.dataset.duration ?? "";
+      seek.hidden = true;
+      seek.style.setProperty("--progress", "0%");
+      seek.setAttribute("aria-valuenow", "0");
+      paintButton(row.querySelector(".transport") as Element, false);
+    };
+
+    const paintRows = () => {
+      rows().forEach((row) => {
+        if (!current || row.dataset.slug !== current.slug) {
+          resetRow(row);
+          return;
+        }
+        const playing = !audio.paused;
+        const glyph = row.querySelector(".glyph") as HTMLElement;
+        const time = row.querySelector(".time") as HTMLElement;
+        const seek = row.querySelector(".seek") as HTMLElement;
+        row.dataset.state = playing ? "playing" : "paused";
+        glyph.textContent = playing ? "▶" : "‖";
+        time.textContent = fmt(audio.currentTime);
+        seek.hidden = false;
+        const pct = progressPct();
+        seek.style.setProperty("--progress", `${pct}%`);
+        seek.setAttribute("aria-valuenow", String(Math.round(pct)));
+        paintButton(row.querySelector(".transport") as Element, playing);
+      });
+    };
+
+    const paint = () => {
+      paintBar();
+      paintRows();
+    };
+
+    const show = () => {
+      bar.hidden = false;
+    };
+
+    const load = (track: Track) => {
+      current = track;
+      audio.src = track.src;
+      audio.currentTime = 0;
+    };
+
+    const playTrack = (track: Track) => {
+      if (!current || current.slug !== track.slug) load(track);
+      // play() rejects when the file is missing; everything returns to rest.
+      audio.play().catch(() => {
+        if (bar.hidden) current = null;
+        paint();
+      });
+    };
+
+    const toggle = () => {
+      if (!current) return;
+      if (audio.paused) {
+        audio.play().catch(() => paint());
+      } else {
+        audio.pause();
+      }
+    };
+
+    const seekTo = (target: HTMLElement, clientX: number) => {
+      if (!Number.isFinite(audio.duration)) return;
+      const rect = target.getBoundingClientRect();
+      const fraction = Math.min(
+        1,
+        Math.max(0, (clientX - rect.left) / rect.width),
+      );
+      audio.currentTime = fraction * audio.duration;
+      paint();
+    };
+
+    const nudge = (key: string) => {
+      if (!Number.isFinite(audio.duration)) return false;
+      if (key !== "ArrowLeft" && key !== "ArrowRight") return false;
+      const step = audio.duration * 0.05;
+      const delta = key === "ArrowRight" ? step : -step;
+      audio.currentTime = Math.min(
+        audio.duration,
+        Math.max(0, audio.currentTime + delta),
+      );
+      paint();
+      return true;
+    };
+
+    const bindSeek = (target: HTMLElement) => {
+      target.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        seekTo(target, event.clientX);
+        try {
+          target.setPointerCapture(event.pointerId);
+        } catch {
+          /* not a live pointer; a plain click still seeks */
+        }
+      });
+      target.addEventListener("pointermove", (event) => {
+        if (target.hasPointerCapture(event.pointerId)) {
+          seekTo(target, event.clientX);
+        }
+      });
+      target.addEventListener("keydown", (event) => {
+        if (nudge(event.key)) event.preventDefault();
+      });
+    };
+
+    // Bar controls, bound once: the bar persists across pages.
+    button.addEventListener("click", toggle);
+    bindSeek(scrubber);
+
+    audio.addEventListener("play", () => {
+      show();
+      paint();
+    });
+    audio.addEventListener("pause", paint);
+    audio.addEventListener("timeupdate", paint);
+    audio.addEventListener("error", () => {
+      if (bar.hidden) current = null;
+      paint();
+    });
+    audio.addEventListener("ended", () => {
+      const index = playlist.findIndex((t) => t.slug === current?.slug);
+      const next = index >= 0 ? playlist[index + 1] : undefined;
+      if (next) {
+        playTrack(next);
+      } else {
+        audio.currentTime = 0;
+        paint();
+      }
+    });
+
+    // Track rows live only on the homepage and are rebuilt on every visit.
+    const bindRows = () => {
+      const pageRows = rows();
+      if (pageRows.length) playlist = pageRows.map(trackFromRow);
+      pageRows.forEach((row) => {
+        if (row.dataset.bound) return;
+        row.dataset.bound = "true";
+        const rowButton = row.querySelector(".transport") as HTMLElement;
+        const seek = row.querySelector(".seek") as HTMLElement;
+        rowButton.addEventListener("click", () => {
+          if (current && current.slug === row.dataset.slug) {
+            toggle();
+          } else {
+            playTrack(trackFromRow(row));
+          }
+        });
+        bindSeek(seek);
+      });
+      paintRows();
+    };
+
+    document.addEventListener("astro:page-load", bindRows);
+  }
+</script>
+
+<style>
+  /* Sits in the page flow, just above the footer, on every screen size. */
+  .player-bar {
+    padding: var(--space-md) var(--page-margin);
+    border-top: 1px solid var(--rule);
+    background: var(--surface);
+  }
+
+  .player-bar[hidden] {
+    display: none;
+  }
+
+  .inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--gutter);
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  /* The transport: same geometry as the track rows. */
+  .transport {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--transport-size);
+    height: var(--transport-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-transport);
+    background: var(--fill-transport);
+    cursor: pointer;
+    flex: none;
+    transition: background-color var(--transition-state);
+  }
+
+  .transport:hover {
+    background: var(--fill-transport-hover);
+  }
+
+  .icon-play {
+    width: 0;
+    height: 0;
+    margin-left: 3px;
+    border-top: 7.5px solid transparent;
+    border-bottom: 7.5px solid transparent;
+    border-left: 13px solid var(--text-on-primary);
+  }
+
+  .icon-pause {
+    display: flex;
+    gap: 5px;
+  }
+
+  .icon-pause::before,
+  .icon-pause::after {
+    content: "";
+    width: 4px;
+    height: 15px;
+    background: var(--text-on-primary);
+  }
+
+  .transport[aria-pressed="true"] .icon-play,
+  .transport[aria-pressed="false"] .icon-pause {
+    display: none;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    min-width: 0;
+  }
+
+  .line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  .title {
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--font-serif);
+    font-size: var(--track-title-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--track-title-lh);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--on-surface);
+  }
+
+  .release {
+    margin-left: var(--space-md);
+    font-family: var(--font-sans);
+    font-size: var(--data-catalog-size);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--data-catalog-ls);
+    text-transform: uppercase;
+    color: var(--text-meta);
+  }
+
+  .times {
+    display: flex;
+    gap: var(--space-xs);
+    flex: none;
+    font-family: var(--font-sans);
+    font-size: var(--data-time-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--data-time-lh);
+    letter-spacing: var(--data-time-ls);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-meta);
+  }
+
+  .elapsed {
+    color: var(--on-surface);
+  }
+
+  /* Scrubber: Light Blue track, Steel Blue elapsed, per the design system. */
+  .scrubber {
+    padding: 6px 0;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .scrubber-track {
+    position: relative;
+    height: var(--scrubber-height);
+    background: var(--scrubber-track);
+  }
+
+  .scrubber-fill {
+    width: var(--progress, 0%);
+    height: var(--scrubber-height);
+    background: var(--scrubber-elapsed);
+  }
+
+  @media (width < 720px) {
+    .player-bar {
+      padding: var(--space-md) 20px;
+    }
+
+    .inner {
+      gap: 14px;
+    }
+
+    /* No room for the release name beside a title on a phone; the title wins. */
+    .release {
+      display: none;
+    }
+  }
+</style>

@@ -80,15 +80,19 @@ const links = [
 </header>
 
 <script>
-  const toggle = document.querySelector(".menu-toggle");
-  const nav = document.getElementById("primary-nav");
+  // Runs on every page load, including client-side navigations, because
+  // the header is rebuilt each time the page changes.
+  document.addEventListener("astro:page-load", () => {
+    const toggle = document.querySelector(".menu-toggle");
+    const nav = document.getElementById("primary-nav");
 
-  if (toggle && nav) {
-    toggle.addEventListener("click", () => {
-      const open = nav.classList.toggle("is-open");
-      toggle.setAttribute("aria-expanded", String(open));
-    });
-  }
+    if (toggle && nav) {
+      toggle.addEventListener("click", () => {
+        const open = nav.classList.toggle("is-open");
+        toggle.setAttribute("aria-expanded", String(open));
+      });
+    }
+  });
 </script>
 
 <style>

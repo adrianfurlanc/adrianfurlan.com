@@ -21,6 +21,11 @@ main {
   flex: 1;
 }
 
+/* The player bar sits in the flow above the footer, so the footer goes last. */
+footer {
+  order: 1;
+}
+
 a {
   color: var(--text-link);
   text-decoration: underline;

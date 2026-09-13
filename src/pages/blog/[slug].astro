@@ -111,10 +111,12 @@ const readTime = Math.max(1, Math.ceil(words / 200));
 
 <script>
   // The HTML carries the absolute date; this turns it into "4 days ago"
-  // in the browser so it never goes stale on a static page.
-  const posted = document.querySelector<HTMLTimeElement>(".posted");
-
-  if (posted && posted.dateTime) {
+  // in the browser so it never goes stale on a static page. Bound on every
+  // page load because client-side navigation rebuilds the page.
+  const relativeDate = () => {
+    const posted = document.querySelector<HTMLTimeElement>(".posted");
+    if (!posted || !posted.dateTime || posted.dataset.relative) return;
+    posted.dataset.relative = "true";
     const then = Date.parse(`${posted.dateTime}T00:00:00Z`);
     const now = new Date();
     const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
@@ -137,7 +139,9 @@ const readTime = Math.max(1, Math.ceil(words / 200));
 
     posted.title = (posted.textContent ?? "").trim();
     posted.textContent = label;
-  }
+  };
+
+  document.addEventListener("astro:page-load", relativeDate);
 </script>
 
 <style>

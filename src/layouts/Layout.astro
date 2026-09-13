@@ -1,4 +1,6 @@
 ---
+import { ClientRouter } from "astro:transitions";
+import PlayerBar from "../components/PlayerBar.astro";
 import "../styles/tokens.css";
 import "../styles/global.css";
 
@@ -24,9 +26,14 @@ const { title = "Adrián Furlan" } = Astro.props;
       rel="stylesheet"
     />
     <title>{title}</title>
+    {
+      /* Client-side navigation so the player bar (and its audio) survives page changes. Pages cross-fade with Astro\'s default. */
+    }
+    <ClientRouter fallback="swap" />
   </head>
   <body>
     <slot />
+    <PlayerBar />
   </body>
 </html>
 

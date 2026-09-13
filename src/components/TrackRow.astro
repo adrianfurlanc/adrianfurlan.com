@@ -7,12 +7,23 @@ interface Props {
   year: string;
   coverSrc: string;
   coverAlt: string;
+  release: string;
 }
 
-const { num, slug, title, duration, year, coverSrc, coverAlt } = Astro.props;
+const { num, slug, title, duration, year, coverSrc, coverAlt, release } =
+  Astro.props;
 ---
 
-<div class="row" data-track data-state="off" data-duration={duration}>
+<div
+  class="row"
+  data-track
+  data-state="off"
+  data-slug={slug}
+  data-title={title}
+  data-duration={duration}
+  data-src={`/audio/${slug}.mp3`}
+  data-release={release}
+>
   <img class="thumb" src={coverSrc} alt={coverAlt} width="56" height="56" />
   <div class="body">
     <div class="title">{title}</div>
@@ -47,7 +58,6 @@ const { num, slug, title, duration, year, coverSrc, coverAlt } = Astro.props;
     <span class="icon-play"></span>
     <span class="icon-pause"></span>
   </button>
-  <audio preload="none" src={`/audio/${slug}.mp3`}></audio>
 </div>
 
 <style>
