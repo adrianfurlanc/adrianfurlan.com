@@ -1,0 +1,171 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  date: string;
+  dateTime: string;
+  excerpt: string;
+  caption: string;
+}
+
+const { title, href, date, dateTime, excerpt, caption } = Astro.props;
+---
+
+<article class="card">
+  <div class="figure"><span class="caption">{caption}</span></div>
+  <time class="date" datetime={dateTime}>{date}</time>
+  <h3 class="title"><a href={href}>{title}</a></h3>
+  <p class="excerpt">{excerpt}</p>
+  <div class="read">
+    <a class="read-link" href={href}>
+      Read<svg
+        class="arrow"
+        width="14"
+        height="11"
+        viewBox="0 0 14 11"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="square"
+        aria-hidden="true"
+      >
+        <path d="M0.5 5.5 H12"></path>
+        <path d="M8.5 2 L12 5.5 L8.5 9"></path>
+      </svg>
+    </a>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .figure {
+    display: flex;
+    align-items: flex-end;
+    aspect-ratio: 16 / 10;
+    padding: 10px;
+    border: 1px solid var(--light-blue);
+    background: var(--foam);
+  }
+
+  .caption {
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    color: var(--chart-grey);
+  }
+
+  .date {
+    display: block;
+    margin-top: 32px;
+    font-family: var(--font-sans);
+    font-size: var(--data-catalog-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--data-catalog-lh);
+    letter-spacing: var(--data-catalog-ls);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--chart-grey);
+  }
+
+  .title {
+    margin: 28px 0 0;
+    font-family: var(--font-serif);
+    font-size: var(--track-title-size);
+    font-weight: var(--weight-bold);
+    line-height: 1.25;
+  }
+
+  .title a {
+    color: var(--sounding-ink);
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .title a:hover {
+    color: var(--title-hover);
+  }
+
+  .excerpt {
+    margin: 28px 0 0;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: var(--weight-regular);
+    line-height: 1.55;
+    color: var(--sounding-ink);
+  }
+
+  .read {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--light-blue);
+  }
+
+  .read-link {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    font-feature-settings: "case" 1;
+    color: var(--deep-water);
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .read-link:hover {
+    color: var(--title-hover);
+  }
+
+  .arrow {
+    margin-left: 8px;
+    flex: none;
+  }
+
+  @media (width < 720px) {
+    .card {
+      padding: 40px 0 37px;
+      border-top: 1px solid var(--light-blue);
+    }
+
+    .figure {
+      padding: 26px;
+    }
+
+    .date {
+      padding: 4px 0;
+    }
+
+    .title {
+      margin-top: 20px;
+      padding: 4px 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .excerpt {
+      margin-top: 20px;
+      padding: 4px 0;
+      font-size: var(--body-md-size);
+      line-height: var(--body-md-lh);
+    }
+
+    .read {
+      margin-top: 20px;
+      padding: 13px 0;
+      border-bottom: 0;
+    }
+  }
+</style>

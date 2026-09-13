@@ -112,6 +112,9 @@
   --radius-control: var(--radius-sm);
   --radius-transport: var(--radius-full);
 
+  /* Artboard-only: post titles and read links hover to this green. Not in DESIGN.md. */
+  --title-hover: #3a7550;
+
   /* Motion */
   --duration-state: 120ms;
   --duration-wash: 160ms;

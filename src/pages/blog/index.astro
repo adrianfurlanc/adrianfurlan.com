@@ -1,0 +1,505 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import PostCard from "../../components/PostCard.astro";
+
+// Newest first. The first post is featured; the rest fill the grid.
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const [featured, ...earlier] = posts;
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+const isoDate = (date: Date) => date.toISOString().slice(0, 10);
+const postHref = (id: string) => `/blog/${id}`;
+---
+
+<Layout title="Blog · Adrián Furlan">
+  <SiteHeader current="blog" />
+  <main class="page">
+    <div class="intro">
+      <h1 class="title">Blog</h1>
+      <p class="lede">Notes on the record, the band, the road.</p>
+    </div>
+    <hr class="rule" />
+
+    {
+      featured && (
+        <section class="featured" aria-labelledby="latest-title">
+          <p class="label featured-label">Latest post</p>
+          <div class="featured-figure">
+            <span class="caption">{featured.data.caption}</span>
+          </div>
+          <div class="featured-body">
+            <h2 class="featured-title" id="latest-title">
+              <a href={postHref(featured.id)}>{featured.data.title}</a>
+            </h2>
+            <p class="featured-excerpt">{featured.data.excerpt}</p>
+            <time class="date" datetime={isoDate(featured.data.date)}>
+              {formatDate(featured.data.date)}
+            </time>
+            <div class="featured-read">
+              <a class="read-link" href={postHref(featured.id)}>
+                Read
+                <svg
+                  class="arrow"
+                  width="14"
+                  height="11"
+                  viewBox="0 0 14 11"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="square"
+                  aria-hidden="true"
+                >
+                  <path d="M0.5 5.5 H12" />
+                  <path d="M8.5 2 L12 5.5 L8.5 9" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <div class="earlier-head">
+      <hr class="rule" />
+      <p class="label">Earlier posts</p>
+    </div>
+    <div class="grid">
+      {
+        earlier.map((post) => (
+          <PostCard
+            title={post.data.title}
+            href={postHref(post.id)}
+            date={formatDate(post.data.date)}
+            dateTime={isoDate(post.data.date)}
+            excerpt={post.data.excerpt}
+            caption={post.data.caption}
+          />
+        ))
+      }
+    </div>
+
+    {
+      /* Decorative for now: there is only one page of posts. Make it real with Astro's paginate() when there are more. */
+    }
+    <nav class="pagination" aria-label="Pagination">
+      <span class="page-prev" aria-disabled="true">
+        <svg
+          class="arrow"
+          width="14"
+          height="11"
+          viewBox="0 0 14 11"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="square"
+          aria-hidden="true"
+        >
+          <path d="M13.5 5.5 H2"></path>
+          <path d="M5.5 2 L2 5.5 L5.5 9"></path>
+        </svg>
+        <span>Prev<span class="prev-tail">ious</span></span>
+      </span>
+      <div class="pages">
+        <span class="page-num" aria-current="page">1</span>
+        <a class="page-num page-link">2</a>
+        <a class="page-num page-link">3</a>
+        <a class="page-num page-link page-num-wide">4</a>
+        <a class="page-num page-link page-num-wide">5</a>
+      </div>
+      <a class="page-next">
+        Next
+        <svg
+          class="arrow"
+          width="14"
+          height="11"
+          viewBox="0 0 14 11"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="square"
+          aria-hidden="true"
+        >
+          <path d="M0.5 5.5 H12"></path>
+          <path d="M8.5 2 L12 5.5 L8.5 9"></path>
+        </svg>
+      </a>
+    </nav>
+  </main>
+  <SiteFooter />
+</Layout>
+
+<style>
+  .page {
+    max-width: 880px;
+    margin: 0 auto 56px;
+    padding: 0 var(--page-margin);
+  }
+
+  .intro {
+    padding-top: 56px;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--headline-md-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--headline-md-lh);
+    letter-spacing: var(--headline-md-ls);
+    color: var(--sounding-ink);
+  }
+
+  .lede {
+    max-width: 34em;
+    margin: var(--space-md) 0 0;
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--body-md-lh);
+    color: var(--sounding-ink);
+  }
+
+  .rule {
+    height: var(--rule-weight);
+    margin: 40px 0 0;
+    border: 0;
+    background: var(--light-blue);
+  }
+
+  .label {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    color: var(--chart-grey);
+  }
+
+  /* Featured post: figure on the left, label + text on the right. */
+  .featured {
+    display: grid;
+    grid-template: "figure label" auto "figure body" 1fr / 1fr 1fr;
+    gap: 0 40px;
+    align-items: start;
+    margin-top: 40px;
+  }
+
+  .featured-label {
+    grid-area: label;
+  }
+
+  .featured-figure {
+    grid-area: figure;
+    display: flex;
+    align-items: flex-end;
+    aspect-ratio: 4 / 3;
+    padding: 10px;
+    border: 1px solid var(--light-blue);
+    background: var(--foam);
+  }
+
+  .caption {
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    color: var(--chart-grey);
+  }
+
+  .featured-body {
+    grid-area: body;
+  }
+
+  .featured-title {
+    margin: 28px 0 0;
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: var(--weight-bold);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  .featured-title a {
+    color: var(--sounding-ink);
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .featured-title a:hover {
+    color: var(--title-hover);
+  }
+
+  .featured-excerpt {
+    margin: 28px 0 0;
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--body-md-lh);
+    color: var(--sounding-ink);
+  }
+
+  .date {
+    display: block;
+    margin-top: 28px;
+    font-family: var(--font-sans);
+    font-size: var(--data-catalog-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--data-catalog-lh);
+    letter-spacing: var(--data-catalog-ls);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--chart-grey);
+  }
+
+  .featured-read {
+    margin-top: 20px;
+  }
+
+  .read-link {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    font-feature-settings: "case" 1;
+    color: var(--deep-water);
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .read-link:hover {
+    color: var(--title-hover);
+  }
+
+  .arrow {
+    margin-left: 8px;
+    flex: none;
+  }
+
+  .earlier-head {
+    margin-top: var(--space-xl);
+  }
+
+  .earlier-head .label {
+    margin-top: var(--gutter);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 56px 40px;
+    margin-top: var(--space-lg);
+  }
+
+  /* Pagination */
+  .pagination {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-top: 56px;
+    padding: 28px 0;
+  }
+
+  .page-prev,
+  .page-next {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .page-prev {
+    justify-self: start;
+    color: var(--light-blue);
+    pointer-events: none;
+  }
+
+  .page-prev .arrow {
+    margin-left: 0;
+  }
+
+  .page-next {
+    justify-self: end;
+    color: var(--deep-water);
+    cursor: pointer;
+  }
+
+  .page-next:hover {
+    color: var(--title-hover);
+  }
+
+  .page-next .arrow {
+    margin-left: 0;
+  }
+
+  .pages {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    color: var(--chart-grey);
+    text-decoration: none;
+    transition:
+      color var(--transition-state),
+      background var(--transition-state),
+      border-color var(--transition-state),
+      transform var(--transition-wash);
+  }
+
+  .page-num[aria-current="page"] {
+    background: var(--primary);
+    color: var(--sleeve);
+  }
+
+  .page-link {
+    cursor: pointer;
+  }
+
+  .page-link:hover {
+    border-color: var(--primary);
+    color: var(--deep-water);
+    transform: translateY(-5px);
+  }
+
+  @media (width < 720px) {
+    .page {
+      padding: 0 20px;
+    }
+
+    .intro {
+      padding-top: 36px;
+    }
+
+    .title {
+      font-size: var(--headline-sm-size);
+      line-height: 1.2;
+      letter-spacing: var(--headline-sm-ls);
+    }
+
+    .lede {
+      margin-top: 14px;
+    }
+
+    .rule {
+      margin-top: var(--space-lg);
+    }
+
+    .featured {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      margin-top: 20px;
+    }
+
+    .featured-figure {
+      margin-top: var(--gutter);
+      padding: 26px;
+    }
+
+    .featured-body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .featured-body .date {
+      order: -1;
+      margin-top: var(--space-md);
+      padding: 4px 0;
+    }
+
+    .featured-title {
+      margin-top: 20px;
+      padding: 4px 0;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    .featured-excerpt {
+      margin-top: 20px;
+      padding: 4px 0;
+    }
+
+    .featured-read {
+      display: flex;
+      justify-content: flex-end;
+      padding: 13px 0;
+    }
+
+    .earlier-head {
+      display: none;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+      margin-top: 40px;
+    }
+
+    .pagination {
+      gap: 12px;
+      margin-top: 0;
+      padding: 40px 0 0;
+      border-top: 1px solid var(--light-blue);
+    }
+
+    .page-prev,
+    .page-next {
+      min-height: var(--transport-size);
+      font-size: 13px;
+    }
+
+    .prev-tail {
+      display: none;
+    }
+
+    .page-num {
+      width: var(--transport-size);
+      height: var(--transport-size);
+      font-size: 15px;
+    }
+
+    .page-num-wide {
+      display: none;
+    }
+  }
+</style>
