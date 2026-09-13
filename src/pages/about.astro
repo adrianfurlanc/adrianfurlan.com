@@ -1,0 +1,205 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+const lineup = [
+  { name: "Adrián Furlan", role: "Songwriter / Guitar" },
+  { name: "Jaime Pérez", role: "Bass" },
+  { name: "Zahir Chacín", role: "Vocals / Guitar" },
+];
+---
+
+<Layout title="About · Adrián Furlan">
+  <SiteHeader current="about" />
+  <main class="page">
+    <h1 class="title">About</h1>
+    <p class="prose">
+      Adrián Furlan is one of the members of the spanish indie rock band known
+      only as "The Fearless". Most of the band's initial rehearsals where at his
+      home in Valencia, Spain. The band later transitioned to rehearsing in a
+      professional recording studio as time went on.
+    </p>
+    <p class="prose">
+      The band formed in September 2024 after connecting with each other via the
+      Vampr mobile app. They rehearsed weekly and created an initial setlist of
+      seven songs, four of which were recorded in three sessions in October 2025
+      to form the basis of this EP.
+    </p>
+    <p class="prose">
+      Despite having several interim drummers, the band has never had a stable
+      presence in the drum department. If you are a drummer, enjoy the songs
+      posted here and would like to join us, please send me a message via this
+      website's contact form and I will try to respond within a couple of days.
+    </p>
+    <p class="prose">
+      The band is currently on hiatus. Our singer, Zahir, moved to Madrid at the
+      end of last year, and we haven't found a replacement for him just yet. If
+      you are a singer who can sing in English and would like to join the band,
+      use the contact form on this website to get in touch with me, and I
+      promise I'll get back to you.
+    </p>
+    <hr class="rule" />
+    <section class="band">
+      <h2 class="band-name">The Fearless</h2>
+      <ul class="lineup">
+        {
+          lineup.map((member) => (
+            <li class="member">
+              <span class="member-name">{member.name}</span>
+              <span class="member-role">{member.role}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="credits">
+        Drums on the record by Murat Mumcuoglu and [drummer, name to come].
+      </p>
+      <p class="credits">Produced by VicsMix.</p>
+    </section>
+  </main>
+  <SiteFooter />
+</Layout>
+
+<style>
+  .page {
+    max-width: 880px;
+    padding: var(--page-margin) var(--page-margin) 48px;
+    margin: 0 auto 40px;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--headline-md-size);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    letter-spacing: var(--headline-md-ls);
+    color: var(--sounding-ink);
+  }
+
+  .prose {
+    max-width: 34em;
+    margin: 20px 0 0;
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--body-lg-lh);
+    color: var(--sounding-ink);
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .title + .prose {
+    margin-top: var(--gutter);
+  }
+
+  .rule {
+    height: var(--rule-weight);
+    margin: 40px 0 0;
+    border: 0;
+    background: var(--light-blue);
+  }
+
+  .band {
+    margin-top: 20px;
+    color: var(--sounding-ink);
+  }
+
+  .band-name {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--headline-sm-size);
+    font-weight: var(--weight-bold);
+    line-height: 1.7;
+  }
+
+  .lineup {
+    max-width: 520px;
+    margin: var(--space-md) auto 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--rule-weight) solid var(--light-blue);
+  }
+
+  .member {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--gutter);
+    padding: 12px 0;
+    border-bottom: var(--rule-weight) solid var(--light-blue);
+  }
+
+  .member-name {
+    font-family: var(--font-serif);
+    font-size: var(--body-lg-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--track-title-lh);
+  }
+
+  .member-role {
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    text-align: right;
+    color: var(--chart-grey);
+  }
+
+  .credits {
+    margin: 1.5em 0 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: var(--weight-regular);
+    line-height: 1.5;
+    color: var(--chart-grey);
+  }
+
+  .lineup + .credits {
+    margin-top: 52px;
+  }
+
+  @media (width < 720px) {
+    .page {
+      padding: 28px 20px 0;
+    }
+
+    .title {
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+    }
+
+    .rule {
+      margin-top: 28px;
+    }
+
+    .band {
+      margin-top: 18px;
+    }
+
+    .band-name {
+      font-size: 24px;
+    }
+
+    .lineup {
+      max-width: none;
+      margin: var(--space-md) 0 0;
+    }
+
+    .member-name {
+      font-size: var(--body-md-size);
+    }
+
+    .credits {
+      font-size: var(--body-sm-size);
+    }
+
+    .lineup + .credits {
+      margin-top: 26px;
+    }
+  }
+</style>

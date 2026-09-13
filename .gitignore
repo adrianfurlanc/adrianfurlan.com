@@ -4,6 +4,9 @@ dist/
 # generated types
 .astro/
 
+# Claude Design export (~25 MB of reference files)
+claude-design/
+
 # dependencies
 node_modules/
 

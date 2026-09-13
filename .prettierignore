@@ -5,3 +5,9 @@ package-lock.json
 # .gitignore, but editor integrations read only this file.
 dist/
 .astro/
+
+# Claude Design export, kept locally as a read-only reference
+claude-design/
+
+# Third-party skill files, kept as their authors wrote them
+.claude/

@@ -1,0 +1,281 @@
+---
+interface Props {
+  current?: "home" | "about" | "blog" | "contact";
+}
+
+const { current } = Astro.props;
+
+const links = [
+  { key: "home", label: "Home", href: "/" },
+  { key: "about", label: "About", href: "/about" },
+  { key: "blog", label: "Blog", href: "/blog" },
+  { key: "contact", label: "Contact", href: "/contact" },
+] as const;
+---
+
+<header class="site-header">
+  <div class="bar">
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Menu"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+    >
+      <svg
+        width="22"
+        height="16"
+        viewBox="0 0 22 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="square"
+        aria-hidden="true"
+      >
+        <path d="M1 1.5h20M1 8h20M1 14.5h20"></path>
+      </svg>
+    </button>
+    <a class="wordmark" href="/">Adrián Furlan</a>
+    <div class="right">
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        {
+          links.map((link) => (
+            <a
+              class="nav-link"
+              href={link.href}
+              aria-current={link.key === current ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          ))
+        }
+        <a
+          class="nav-link"
+          href="https://linktr.ee/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Listen<svg
+            class="arrow"
+            width="11"
+            height="11"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="square"
+            aria-hidden="true"
+          >
+            <path d="M3.25 8.75 L8.75 3.25"></path>
+            <path d="M4.75 3.25 H8.75 V7.25"></path>
+          </svg>
+        </a>
+      </nav>
+      <div class="lang" role="group" aria-label="Language">
+        <a class="lang-option" aria-current="true">EN</a>
+        <a class="lang-option">ES</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector(".menu-toggle");
+  const nav = document.getElementById("primary-nav");
+
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => {
+      const open = nav.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    background: var(--sounding-ink);
+  }
+
+  .bar {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 20px var(--page-margin);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--gutter);
+    flex-wrap: wrap;
+  }
+
+  .wordmark {
+    font-family: var(--font-serif);
+    font-size: var(--headline-sm-size);
+    font-weight: var(--weight-bold);
+    line-height: 1.1;
+    letter-spacing: var(--headline-sm-ls);
+    color: var(--sleeve);
+    text-decoration: none;
+  }
+
+  .wordmark:hover {
+    color: var(--sleeve);
+  }
+
+  .right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
+  }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    font-feature-settings: "case" 1;
+    text-decoration: none;
+    color: var(--light-blue);
+    transition: var(--transition-state);
+  }
+
+  .nav-link[aria-current="page"] {
+    color: var(--sleeve);
+  }
+
+  .nav-link:hover {
+    color: var(--celadon);
+  }
+
+  .arrow {
+    margin-left: 6px;
+    flex: none;
+  }
+
+  .lang {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--light-blue);
+    border-radius: var(--radius-control);
+    overflow: hidden;
+    margin-left: 28px;
+  }
+
+  .lang-option {
+    display: flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 9px;
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    letter-spacing: var(--label-caps-ls);
+    text-decoration: none;
+    color: var(--light-blue);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition-state);
+  }
+
+  .lang-option:hover {
+    color: var(--light-blue);
+  }
+
+  .lang-option[aria-current="true"],
+  .lang-option[aria-current="true"]:hover {
+    color: var(--sounding-ink);
+    background: var(--sleeve);
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  @media (width < 720px) {
+    .bar {
+      padding: 14px 20px 16px;
+      gap: 0 14px;
+      align-items: center;
+    }
+
+    .right {
+      display: contents;
+    }
+
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      margin-left: -10px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--sleeve);
+      cursor: pointer;
+      flex: none;
+      order: 1;
+    }
+
+    .wordmark {
+      display: flex;
+      align-items: center;
+      height: 44px;
+      flex: 1;
+      font-size: 22px;
+      line-height: 1;
+      order: 2;
+    }
+
+    .lang {
+      margin-left: 0;
+      order: 3;
+    }
+
+    .nav {
+      display: none;
+      flex-basis: 100%;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 14px;
+      border-top: 1px solid var(--deep-water);
+      order: 4;
+    }
+
+    .nav.is-open {
+      display: flex;
+    }
+
+    .nav-link {
+      display: flex;
+      width: 100%;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--deep-water);
+    }
+
+    .nav-link:last-child {
+      border-bottom: 0;
+    }
+
+    .nav-link:hover {
+      color: var(--light-blue);
+    }
+
+    .nav-link[aria-current="page"]:hover {
+      color: var(--sleeve);
+    }
+  }
+</style>

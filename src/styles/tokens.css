@@ -1,0 +1,121 @@
+/*
+ * Soundings design tokens.
+ * Transcribed from the Claude Design export's token CSS files
+ * (claude-design/…/_ds/soundings-design-system-…/tokens/) so component
+ * CSS can reference the same names as the design system.
+ */
+:root {
+  /* Base palette: a bathymetric depth ramp, shallow green to deep blue */
+  --sleeve: #f8fbf4;
+  --foam: #eef4e8;
+  --shoal: #d0efb1;
+  --celadon: #b3d89c;
+  --light-blue: #9dc3c2;
+  --steel-blue: #77a6b6;
+  --rich-cerulean: #4d7298;
+  --deep-water: #33547d;
+  --sounding-ink: #142227;
+  --chart-grey: #566d78;
+  --rust: #924229;
+
+  /* Semantic aliases */
+  --surface: var(--sleeve);
+  --surface-hover: var(--foam);
+  --surface-live: var(--shoal);
+  --on-surface: var(--sounding-ink);
+  --on-surface-muted: var(--chart-grey);
+  --primary: var(--rich-cerulean);
+  --primary-strong: var(--deep-water);
+  --secondary: var(--steel-blue);
+  --tertiary: var(--celadon);
+  --border: var(--light-blue);
+  --error: var(--rust);
+
+  /* Role tokens */
+  --text-body: var(--sounding-ink);
+  --text-meta: var(--chart-grey);
+  --text-link: var(--deep-water);
+  --text-on-primary: var(--sleeve);
+  --surface-page: var(--sleeve);
+  --surface-chip: var(--celadon);
+  --rule: var(--light-blue);
+  --scrubber-track: var(--light-blue);
+  --scrubber-elapsed: var(--steel-blue);
+  --fill-transport: var(--rich-cerulean);
+  --fill-transport-hover: var(--deep-water);
+
+  /* Fonts */
+  --font-serif: "Newsreader", "Iowan Old Style", "Georgia", serif;
+  --font-sans: "Archivo", "Helvetica Neue", "Arial", sans-serif;
+
+  /* Type scale */
+  --display-size: 80px;
+  --display-weight: 700;
+  --display-lh: 1;
+  --display-ls: -0.03em;
+  --headline-lg-size: 50px;
+  --headline-lg-lh: 1.08;
+  --headline-lg-ls: -0.025em;
+  --headline-md-size: 38px;
+  --headline-md-lh: 1.15;
+  --headline-md-ls: -0.02em;
+  --headline-sm-size: 28px;
+  --headline-sm-lh: 1.2;
+  --headline-sm-ls: -0.015em;
+  --track-title-size: 21px;
+  --track-title-lh: 1.3;
+  --body-lg-size: 19px;
+  --body-lg-lh: 1.65;
+  --body-md-size: 17px;
+  --body-md-lh: 1.6;
+  --body-sm-size: 14px;
+  --body-sm-lh: 1.5;
+  --body-sm-ls: 0.005em;
+  --label-caps-size: 11px;
+  --label-caps-lh: 1.3;
+  --label-caps-ls: 0.12em;
+  --label-md-size: 13px;
+  --label-md-lh: 1.4;
+  --label-md-ls: 0.005em;
+  --data-time-size: 13px;
+  --data-time-lh: 1;
+  --data-time-ls: 0.01em;
+  --data-catalog-size: 12px;
+  --data-catalog-lh: 1.3;
+  --data-catalog-ls: 0.06em;
+  --caption-size: 12px;
+  --caption-lh: 1.45;
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --measure: 68ch;
+
+  /* Spacing */
+  --space-base: 8px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 32px;
+  --space-xl: 64px;
+  --space-xxl: 96px;
+  --gutter: 24px;
+  --page-margin: 40px;
+  --grid-columns: 12;
+  --rule-weight: 1px;
+  --scrubber-height: 2px;
+  --transport-size: 44px;
+
+  /* Shape */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-full: 9999px;
+  --radius-structural: var(--radius-none);
+  --radius-control: var(--radius-sm);
+  --radius-transport: var(--radius-full);
+
+  /* Motion */
+  --duration-state: 120ms;
+  --duration-wash: 160ms;
+  --ease-out: ease-out;
+  --transition-state: 120ms ease-out;
+  --transition-wash: 160ms ease-out;
+}

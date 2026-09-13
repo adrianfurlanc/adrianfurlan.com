@@ -1,0 +1,27 @@
+/* Base document styles, from the design system's tokens/base.css. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-serif);
+  font-size: var(--body-md-size);
+  line-height: var(--body-md-lh);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: var(--transition-state);
+}
+
+a:hover {
+  color: var(--primary);
+  text-decoration-thickness: 2px;
+}
