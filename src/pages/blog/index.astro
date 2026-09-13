@@ -4,22 +4,11 @@ import Layout from "../../layouts/Layout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 import PostCard from "../../components/PostCard.astro";
+import { byNewest, formatDate, isoDate, postHref } from "../../utils/blog";
 
 // Newest first. The first post is featured; the rest fill the grid.
-const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+const posts = (await getCollection("blog")).sort(byNewest);
 const [featured, ...earlier] = posts;
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-const isoDate = (date: Date) => date.toISOString().slice(0, 10);
-const postHref = (id: string) => `/blog/${id}`;
 ---
 
 <Layout title="Blog · Adrián Furlan">

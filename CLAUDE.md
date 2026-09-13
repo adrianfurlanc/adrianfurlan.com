@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `adrianfurlan.com` — Adrián Furlan's personal music portfolio (Astro 7, TypeScript 6, Node >= 22.12.0, static output). The visual system is "Soundings", documented in `DESIGN.md`; the Claude Design export it was built from lives in the gitignored `claude-design/` folder (reference only, never edit it).
 
-Current state: the About page (`src/pages/about.astro`) is built for desktop and mobile from artboards `1f` and `1i`. The homepage (`src/pages/index.astro`) is a placeholder: shared header and footer with an empty `<main>`. The Contact page (`src/pages/contact.astro`) is built for both widths with a visual-only form. The blog list page (`src/pages/blog/index.astro`) reads posts from the content collection; single post pages (`/blog/<slug>`) are not built yet, so post links 404. `README.md` still documents the Astro starter template, not this site.
+Current state: the About page (`src/pages/about.astro`) is built for desktop and mobile from artboards `1f` and `1i`. The homepage (`src/pages/index.astro`) is a placeholder: shared header and footer with an empty `<main>`. The Contact page (`src/pages/contact.astro`) is built for both widths with a visual-only form. The blog list page (`src/pages/blog/index.astro`) reads posts from the content collection and `src/pages/blog/[slug].astro` renders each post; the post's "N days ago" line is computed in the browser by a small script while the HTML carries the absolute date. Archivo Narrow is loaded only for the post page's "All posts" link. `README.md` still documents the Astro starter template, not this site.
 
 ## Commands
 
@@ -54,7 +54,7 @@ Stock static Astro with no integrations and no adapter — `astro.config.mjs` is
 - `src/styles/tokens.css` — the Soundings design tokens as CSS custom properties, same names as the export's `_ds/.../tokens/*.css`. `src/styles/global.css` is the base reset. Both are imported once in `Layout.astro`; components reference `var(--…)` and never repeat hex values.
 - `src/components/SiteHeader.astro` / `SiteFooter.astro` — the shared chrome. The header takes `current` (`"home" | "about" | "blog" | "contact"`) and owns the mobile hamburger menu (a small `<script>` toggles `.is-open` and `aria-expanded`).
 - Responsive rule: one breakpoint, `@media (width < 720px)` (range syntax, required by Stylelint), placed at the end of each component's `<style>`. Desktop is the default; the media query overrides only what changes on phones.
-- `src/content.config.ts` + `src/content/blog/*.md` — the blog posts as an Astro content collection (front matter: `title`, `date`, `excerpt`, `caption`). Add a post by adding a file. `src/components/PostCard.astro` renders one grid card. The blog's pagination row is decorative until there are enough posts to page.
+- `src/content.config.ts` + `src/content/blog/*.md` — the blog posts as an Astro content collection (front matter: `title`, `date`, `excerpt`, `caption`). Add a post by adding a file. `src/components/PostCard.astro` renders one grid card. Shared blog helpers (newest-first sort, date formatting, post URLs) live in `src/utils/blog.ts`; import them rather than re-declaring. The blog's pagination row is decorative until there are enough posts to page.
 - `src/assets/` — images imported in frontmatter and referenced as `{img.src}` so Astro processes them (currently empty). `public/` is served verbatim.
 
 ## Commits

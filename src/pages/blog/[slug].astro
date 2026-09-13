@@ -1,0 +1,374 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import { byNewest, formatDate, isoDate, postHref } from "../../utils/blog";
+
+// One page per post. Posts are sorted newest first so each page also
+// knows its neighbours: "newer" is the next post, "older" the previous.
+export async function getStaticPaths() {
+  const sorted = (await getCollection("blog")).sort(byNewest);
+  return sorted.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: sorted[i - 1], older: sorted[i + 1] },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  newer?: CollectionEntry<"blog">;
+  older?: CollectionEntry<"blog">;
+}
+
+const { post, newer, older } = Astro.props;
+const { Content } = await render(post);
+
+const words = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+const readTime = Math.max(1, Math.ceil(words / 200));
+---
+
+<Layout title={`${post.data.title} · Adrián Furlan`}>
+  <SiteHeader current="blog" />
+  <main class="page">
+    {!newer && <p class="label latest">Latest post</p>}
+    <div class="figure"><span class="caption">{post.data.caption}</span></div>
+    <article class="post">
+      <h1 class="title">{post.data.title}</h1>
+      <p class="meta">
+        <span>{readTime} min read</span>
+        <span aria-hidden="true">·</span>
+        <time class="posted" datetime={isoDate(post.data.date)}>
+          {formatDate(post.data.date)}
+        </time>
+      </p>
+      <div class="body post-body">
+        <Content />
+      </div>
+
+      <nav class="neighbours" aria-label="Previous and next posts">
+        {
+          older ? (
+            <a class="neighbour neighbour-link" href={postHref(older.id)}>
+              <span class="label">Previous</span>
+              <span class="neighbour-title">{older.data.title}</span>
+              <time class="neighbour-date" datetime={isoDate(older.data.date)}>
+                {formatDate(older.data.date)}
+              </time>
+            </a>
+          ) : (
+            <div class="neighbour">
+              <span class="label">Previous</span>
+              <p class="neighbour-note">You are reading the oldest post.</p>
+            </div>
+          )
+        }
+        {
+          newer ? (
+            <a
+              class="neighbour neighbour-link neighbour-next"
+              href={postHref(newer.id)}
+            >
+              <span class="label">Next</span>
+              <span class="neighbour-title">{newer.data.title}</span>
+              <time class="neighbour-date" datetime={isoDate(newer.data.date)}>
+                {formatDate(newer.data.date)}
+              </time>
+            </a>
+          ) : (
+            <div class="neighbour neighbour-next">
+              <span class="label">Next</span>
+              <p class="neighbour-note">You are reading the newest post.</p>
+            </div>
+          )
+        }
+      </nav>
+
+      <div class="all-posts">
+        <a class="all-posts-link" href="/blog">
+          <svg
+            class="arrow"
+            width="14"
+            height="11"
+            viewBox="0 0 14 11"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="square"
+            aria-hidden="true"
+          >
+            <path d="M13.5 5.5 H2"></path>
+            <path d="M5.5 2 L2 5.5 L5.5 9"></path>
+          </svg>
+          All posts
+        </a>
+      </div>
+    </article>
+  </main>
+  <SiteFooter />
+</Layout>
+
+<script>
+  // The HTML carries the absolute date; this turns it into "4 days ago"
+  // in the browser so it never goes stale on a static page.
+  const posted = document.querySelector<HTMLTimeElement>(".posted");
+
+  if (posted && posted.dateTime) {
+    const then = Date.parse(`${posted.dateTime}T00:00:00Z`);
+    const now = new Date();
+    const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((today - then) / 86_400_000);
+
+    let label: string;
+    if (days <= 0) {
+      label = "today";
+    } else if (days === 1) {
+      label = "yesterday";
+    } else if (days < 30) {
+      label = `${days} days ago`;
+    } else if (days < 365) {
+      const months = Math.floor(days / 30);
+      label = months === 1 ? "1 month ago" : `${months} months ago`;
+    } else {
+      const years = Math.floor(days / 365);
+      label = years === 1 ? "1 year ago" : `${years} years ago`;
+    }
+
+    posted.title = (posted.textContent ?? "").trim();
+    posted.textContent = label;
+  }
+</script>
+
+<style>
+  .page {
+    max-width: 880px;
+    margin: 0 auto 40px;
+    padding: var(--space-lg) var(--page-margin) 0;
+  }
+
+  .figure {
+    display: flex;
+    align-items: flex-end;
+    aspect-ratio: 16 / 9;
+    padding: 10px;
+    border: 1px solid var(--light-blue);
+    background: var(--foam);
+  }
+
+  .caption,
+  .label {
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+    color: var(--chart-grey);
+  }
+
+  .latest {
+    margin: 0 0 var(--space-md);
+  }
+
+  .post {
+    max-width: calc(68ch + 80px);
+    margin: 0 auto;
+    padding-top: 36px;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 44px;
+    font-weight: var(--weight-bold);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: var(--sounding-ink);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--body-sm-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--label-caps-lh);
+    font-variant-numeric: tabular-nums;
+    color: var(--chart-grey);
+  }
+
+  .body {
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--light-blue);
+  }
+
+  .neighbours {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gutter) var(--space-lg);
+    margin-top: var(--space-sm);
+    padding: 28px 0;
+    border-top: 1px solid var(--light-blue);
+  }
+
+  .neighbour {
+    display: block;
+    color: var(--sounding-ink);
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .neighbour-link:hover {
+    color: var(--deep-water);
+  }
+
+  .neighbour-next {
+    text-align: right;
+  }
+
+  .neighbour-title {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--font-serif);
+    font-size: var(--track-title-size);
+    font-weight: var(--weight-bold);
+    line-height: 1.25;
+  }
+
+  .neighbour-date {
+    display: block;
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--data-catalog-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--data-catalog-lh);
+    letter-spacing: var(--data-catalog-ls);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--chart-grey);
+  }
+
+  .neighbour-note {
+    margin: 10px 0 0;
+    font-family: var(--font-serif);
+    font-size: var(--body-md-size);
+    font-weight: var(--weight-regular);
+    line-height: 1.5;
+    color: var(--chart-grey);
+  }
+
+  .all-posts {
+    border-top: 1px solid var(--light-blue);
+  }
+
+  .all-posts-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 13px 0;
+    font-family: var(--font-sans-narrow);
+    font-size: var(--body-sm-size);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--deep-water);
+    text-decoration: none;
+    transition: color var(--transition-state);
+  }
+
+  .all-posts-link:hover {
+    color: var(--title-hover);
+  }
+
+  .arrow {
+    margin-right: var(--space-sm);
+    flex: none;
+  }
+
+  @media (width < 720px) {
+    .page {
+      padding: 20px 20px 0;
+    }
+
+    .figure {
+      aspect-ratio: 4 / 3;
+    }
+
+    .post {
+      padding-top: var(--gutter);
+    }
+
+    .title {
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .meta {
+      margin-top: 14px;
+    }
+
+    .body {
+      margin-top: 22px;
+      padding-top: 22px;
+    }
+
+    .neighbours {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--gutter);
+      margin-top: var(--space-xs);
+    }
+
+    .neighbour-title,
+    .neighbour-date,
+    .neighbour-note {
+      display: none;
+    }
+
+    /* Only the labels show on phones: dark when linked, faded when there is no post that way. */
+    .neighbour-link .label {
+      color: var(--sounding-ink);
+    }
+
+    .neighbour:not(.neighbour-link) .label {
+      color: var(--light-blue);
+    }
+
+    .all-posts-link {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Rendered Markdown lives outside the scoped styles, so these are global. */
+  .post-body p {
+    margin: 0 0 1.2em;
+    font-family: var(--font-serif);
+    font-size: var(--body-lg-size);
+    font-weight: var(--weight-regular);
+    line-height: var(--body-lg-lh);
+    color: var(--sounding-ink);
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .post-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (width < 720px) {
+    .post-body p {
+      font-size: var(--body-md-size);
+      line-height: var(--body-md-lh);
+    }
+  }
+</style>

@@ -47,6 +47,8 @@
   /* Fonts */
   --font-serif: "Newsreader", "Iowan Old Style", "Georgia", serif;
   --font-sans: "Archivo", "Helvetica Neue", "Arial", sans-serif;
+  --font-sans-narrow:
+    "Archivo Narrow", "Archivo", "Helvetica Neue", "Arial", sans-serif;
 
   /* Type scale */
   --display-size: 80px;
