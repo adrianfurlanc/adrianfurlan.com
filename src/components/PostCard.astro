@@ -76,6 +76,7 @@ const { title, href, date, dateTime, excerpt, caption, image } = Astro.props;
     width: 100%;
     height: auto;
     padding: 0;
+    border: 0;
     object-fit: cover;
   }
 
@@ -183,6 +184,10 @@ const { title, href, date, dateTime, excerpt, caption, image } = Astro.props;
 
     .figure {
       padding: 26px;
+    }
+
+    .figure-photo {
+      padding: 0;
     }
 
     .date {
