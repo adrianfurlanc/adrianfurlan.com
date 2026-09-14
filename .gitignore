@@ -7,6 +7,11 @@ dist/
 # Claude Design export (~25 MB of reference files)
 claude-design/
 
+# Local Claude Code tooling: the preview-server config for this machine and
+# third-party skill folders. Shared config (settings.json, commands/) is not ignored.
+.claude/launch.json
+.claude/skills/
+
 # Audio for the homepage player. Kept out of history until release; see
 # public/audio/.gitkeep for the expected filenames.
 public/audio/*.mp3
