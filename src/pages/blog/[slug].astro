@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
@@ -33,7 +34,22 @@ const readTime = Math.max(1, Math.ceil(words / 200));
   <SiteHeader current="blog" />
   <main class="page">
     {!newer && <p class="label latest">Latest post</p>}
-    <div class="figure"><span class="caption">{post.data.caption}</span></div>
+    {
+      post.data.image ? (
+        <Image
+          class="figure figure-photo"
+          src={post.data.image}
+          alt={post.data.caption}
+          widths={[720, 1440]}
+          sizes="(width < 720px) calc(100vw - 40px), 800px"
+          format="webp"
+        />
+      ) : (
+        <div class="figure">
+          <span class="caption">{post.data.caption}</span>
+        </div>
+      )
+    }
     <article class="post">
       <h1 class="title">{post.data.title}</h1>
       <p class="meta">
@@ -159,6 +175,15 @@ const readTime = Math.max(1, Math.ceil(words / 200));
     border: 1px solid var(--light-blue);
     background: var(--foam);
     transition: transform var(--transition-wash);
+  }
+
+  /* A real photo fills the same box: same ratio, border, and hover as the placeholder. */
+  .figure-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    object-fit: cover;
   }
 
   .caption,
@@ -380,6 +405,15 @@ const readTime = Math.max(1, Math.ceil(words / 200));
 
   .post-body p:last-child {
     margin-bottom: 0;
+  }
+
+  /* Images written in the Markdown: fit the column, hard edges, hairline border. */
+  .post-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.2em 0;
+    border: 1px solid var(--light-blue);
   }
 
   @media (width < 720px) {

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
@@ -24,9 +25,20 @@ const [featured, ...earlier] = posts;
       featured && (
         <section class="featured" aria-labelledby="latest-title">
           <p class="label featured-label">Latest post</p>
-          <div class="featured-figure">
-            <span class="caption">{featured.data.caption}</span>
-          </div>
+          {featured.data.image ? (
+            <Image
+              class="featured-figure featured-photo"
+              src={featured.data.image}
+              alt={featured.data.caption}
+              widths={[400, 800]}
+              sizes="(width < 720px) calc(100vw - 40px), 400px"
+              format="webp"
+            />
+          ) : (
+            <div class="featured-figure">
+              <span class="caption">{featured.data.caption}</span>
+            </div>
+          )}
           <div class="featured-body">
             <h2 class="featured-title" id="latest-title">
               <a href={postHref(featured.id)}>{featured.data.title}</a>
@@ -73,6 +85,7 @@ const [featured, ...earlier] = posts;
             dateTime={isoDate(post.data.date)}
             excerpt={post.data.excerpt}
             caption={post.data.caption}
+            image={post.data.image}
           />
         ))
       }
@@ -200,6 +213,14 @@ const [featured, ...earlier] = posts;
     border: 1px solid var(--light-blue);
     background: var(--foam);
     transition: transform var(--transition-wash);
+  }
+
+  .featured-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    object-fit: cover;
   }
 
   .caption {
