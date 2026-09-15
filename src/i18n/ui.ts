@@ -18,7 +18,7 @@ const en = {
   header: { menu: "Menu", primary: "Primary", language: "Language" },
   player: player.en,
   home: {
-    lede: "Four tracks written by Adrián over 20 years ago and recorded in Jaime's home studio over the span of 3 days in October 2025. Adrián only plays the guitar, it is The Fearless who fill the room. Press play on anything below.",
+    lede: "Four tracks written by Adrián over 20 years ago and recorded in a home studio over the span of 3 days in October 2025. Adrián only plays the guitar, it is The Fearless who fill the room. Press play on anything below.",
     tracks: (n: number) => (n === 1 ? "1 track" : `${n} tracks`),
     tracksHeading: "Tracks",
     pressPlay: "Press play",
@@ -46,6 +46,17 @@ const en = {
     message: "Message",
     placeholder: "Shows, press, or anything else.",
     send: "Send",
+    // The sending flow: subject line of the email, button label while
+    // sending, the thank-you block, the failure line, and one message per field.
+    subject: "Message from adrianfurlan.com",
+    sending: "Sending…",
+    sentTitle: "Thanks. Adrián reads everything and replies within a few days.",
+    sentLabel: "Message sent",
+    error:
+      "Something went wrong and the message was not sent. Please try again in a moment.",
+    nameRequired: "Please add your name.",
+    emailInvalid: "Please add a valid email address.",
+    messageRequired: "Please write a message.",
   },
   blog: {
     title: "Blog",
@@ -87,7 +98,7 @@ const es: Dictionary = {
   header: { menu: "Menú", primary: "Principal", language: "Idioma" },
   player: player.es,
   home: {
-    lede: "Cuatro temas que Adrián escribió hace más de 20 años, grabados en el estudio casero de Jaime a lo largo de 3 días en octubre de 2025. Adrián solo toca la guitarra; son The Fearless quienes llenan la sala. Dale al play a cualquiera de los temas.",
+    lede: "Cuatro temas que Adrián escribió hace más de 20 años, grabados en un estudio casero a lo largo de 3 días en octubre de 2025.",
     tracks: (n) => (n === 1 ? "1 tema" : `${n} temas`),
     tracksHeading: "Temas",
     pressPlay: "Dale al play",
@@ -96,8 +107,8 @@ const es: Dictionary = {
     title: "Sobre mí",
     paragraphs: [
       "Adrián Furlan es uno de los miembros de la banda española de indie rock conocida simplemente como «The Fearless». La mayoría de los primeros ensayos de la banda fueron en su casa de Valencia, España. Con el tiempo, la banda pasó a ensayar en un estudio de grabación profesional.",
-      "La banda se formó en septiembre de 2024 tras conocerse a través de la aplicación móvil Vampr. Ensayaban cada semana y crearon un repertorio inicial de siete canciones, cuatro de las cuales se grabaron en tres sesiones en octubre de 2025 y forman la base de este EP.",
-      "A pesar de haber contado con varios baterías temporales, la banda nunca ha tenido una presencia estable a la batería. Si tocas la batería, te gustan las canciones publicadas aquí y quieres unirte a nosotros, escríbeme a través del formulario de contacto de esta web e intentaré responderte en un par de días.",
+      "La banda se formó en septiembre de 2024 tras conocerse a través de la aplicación móvil Vampr. Ensayaban cada semana y crearon un repertorio inicial de siete canciones, cuatro de las cuales se grabaron en tres sesiones en octubre de 2025 para formar la base de este EP.",
+      "A pesar de haber contado con varios baterías temporales, la banda nunca ha tenido una presencia estable en la batería. Si tocas la batería, te gustan las canciones publicadas aquí y quieres unirte a nosotros, escríbeme a través del formulario de contacto de esta web e intentaré responderte en un par de días.",
       "La banda está actualmente en pausa. Nuestro cantante, Zahir, se mudó a Madrid a finales del año pasado y todavía no hemos encontrado a nadie que lo sustituya. Si cantas, puedes hacerlo en inglés y te gustaría unirte a la banda, ponte en contacto conmigo a través del formulario de esta web; te prometo que te responderé.",
     ],
     roles: ["Compositor / Guitarra", "Bajo", "Voz / Guitarra"],
@@ -114,6 +125,16 @@ const es: Dictionary = {
     message: "Mensaje",
     placeholder: "Conciertos, prensa o cualquier otra cosa.",
     send: "Enviar",
+    subject: "Mensaje desde adrianfurlan.com",
+    sending: "Enviando…",
+    sentTitle:
+      "Gracias. Adrián lee todos los mensajes y responde en unos días.",
+    sentLabel: "Mensaje enviado",
+    error:
+      "Algo ha fallado y el mensaje no se ha enviado. Inténtalo de nuevo en un momento.",
+    nameRequired: "Escribe tu nombre.",
+    emailInvalid: "Escribe una dirección de correo válida.",
+    messageRequired: "Escribe un mensaje.",
   },
   blog: {
     title: "Blog",

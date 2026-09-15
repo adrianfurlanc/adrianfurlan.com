@@ -31,6 +31,9 @@
   --border: var(--light-blue);
   --error: var(--rust);
 
+  /* Artboard-only: the Contact page's "Message sent" banner. Same green as --title-hover; not in DESIGN.md. */
+  --success: #3a7550;
+
   /* Role tokens */
   --text-body: var(--sounding-ink);
   --text-meta: var(--chart-grey);

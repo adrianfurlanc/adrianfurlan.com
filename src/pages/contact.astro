@@ -4,6 +4,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import { localeOf } from "../i18n";
 import { ui } from "../i18n/ui";
+import { contactForm } from "../data/contact";
 
 const t = ui[localeOf(Astro)];
 ---
@@ -16,32 +17,171 @@ const t = ui[localeOf(Astro)];
       <p class="lede">{t.contact.lede}</p>
     </div>
     {
-      /* Visual only for now. To wire it up: give the form an action and method
-        (or a form service's endpoint) and change the button to type="submit". */
+      /* Posts to Formspree (address in src/data/contact.ts). It works without
+        JavaScript too; the script below keeps the visitor on this page and
+        swaps in the thank-you block. data-state: idle | sending | sent | error. */
     }
-    <form class="form" novalidate>
+    <form
+      class="form"
+      method="POST"
+      action={contactForm.endpoint}
+      novalidate
+      data-state="idle"
+    >
+      <input type="hidden" name="subject" value={t.contact.subject} />
+      {
+        /* Honeypot: people never see it, bots fill it, Formspree drops those.
+          Hidden with display: none so browser autofill leaves it alone. */
+      }
+      <input
+        class="gotcha"
+        type="text"
+        name="_gotcha"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+      />
       <div class="field">
         <label for="name">{t.contact.name}</label>
-        <input id="name" name="name" type="text" autocomplete="name" />
+        <input id="name" name="name" type="text" autocomplete="name" required />
+        <p class="field-error" hidden>{t.contact.nameRequired}</p>
       </div>
       <div class="field">
         <label for="email">{t.contact.email}</label>
-        <input id="email" name="email" type="email" autocomplete="email" />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+        />
+        <p class="field-error" hidden>{t.contact.emailInvalid}</p>
       </div>
       <div class="field">
         <label for="message">{t.contact.message}</label>
         <textarea
           id="message"
           name="message"
-          placeholder={t.contact.placeholder}></textarea>
+          placeholder={t.contact.placeholder}
+          required></textarea>
+        <p class="field-error" hidden>{t.contact.messageRequired}</p>
       </div>
       <div class="actions">
-        <button class="send" type="button">{t.contact.send}</button>
+        <button class="send" type="submit" data-sending={t.contact.sending}>
+          {t.contact.send}
+        </button>
+        <p class="form-error" role="alert" hidden>{t.contact.error}</p>
       </div>
     </form>
+    <div class="sent" hidden>
+      <p class="sent-title" tabindex="-1">{t.contact.sentTitle}</p>
+      <p class="sent-label" role="status">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="square"
+          aria-hidden="true"
+        >
+          <path d="M2 7.5 L5.5 11 L12 3.5"></path>
+        </svg>
+        {t.contact.sentLabel}
+      </p>
+    </div>
   </main>
   <SiteFooter />
 </Layout>
+
+<script>
+  // Sends the form in the background and shows the site's own thank-you block
+  // instead of Formspree's page. Every piece of wording is already in the
+  // HTML, so this script only toggles what is visible. Bound on every page
+  // load because client-side navigation rebuilds the page.
+  type Field = HTMLInputElement | HTMLTextAreaElement;
+  type State = "idle" | "sending" | "sent" | "error";
+
+  const bindContactForm = () => {
+    const form = document.querySelector<HTMLFormElement>(".form");
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = "true";
+
+    const button = form.querySelector<HTMLButtonElement>(".send");
+    const formError = form.querySelector<HTMLElement>(".form-error");
+    const sent = document.querySelector<HTMLElement>(".sent");
+    if (!button || !formError || !sent) return;
+    const sendLabel = button.textContent;
+
+    const fields = ["name", "email", "message"].map((name) => {
+      const input = form.elements.namedItem(name) as Field;
+      const error = input
+        .closest(".field")
+        ?.querySelector<HTMLElement>(".field-error");
+      return { input, error };
+    });
+
+    const valid = (input: Field) => {
+      const value = input.value.trim();
+      if (input.type === "email")
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      return value.length > 0;
+    };
+
+    const setState = (state: State) => {
+      form.dataset.state = state;
+      const sending = state === "sending";
+      button.disabled = sending;
+      button.textContent = sending
+        ? (button.dataset.sending ?? sendLabel)
+        : sendLabel;
+      formError.hidden = state !== "error";
+      if (state === "sent") {
+        form.hidden = true;
+        sent.hidden = false;
+        sent.querySelector<HTMLElement>(".sent-title")?.focus();
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      // Check the three fields; stop at the first problem.
+      let firstBad: Field | undefined;
+      for (const { input, error } of fields) {
+        const ok = valid(input);
+        if (ok) input.removeAttribute("aria-invalid");
+        else input.setAttribute("aria-invalid", "true");
+        if (error) error.hidden = ok;
+        if (!ok && !firstBad) firstBad = input;
+      }
+      if (firstBad) {
+        firstBad.focus();
+        return;
+      }
+
+      setState("sending");
+      // A person is sending this (they pressed Send and passed the checks), so
+      // empty the honeypot in case browser autofill wrote into it. Bots that
+      // post straight to Formspree never run this and still get caught.
+      const gotcha = form.elements.namedItem("_gotcha") as HTMLInputElement;
+      gotcha.value = "";
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        setState(response.ok ? "sent" : "error");
+      } catch {
+        setState("error");
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", bindContactForm);
+</script>
 
 <style>
   .page {
@@ -163,12 +303,93 @@ const t = ui[localeOf(Astro)];
       transform var(--transition-wash);
   }
 
-  .send:hover {
+  /* While a message is on its way: the design system's disabled button. */
+  .send:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .send:not(:disabled):hover {
     background: var(--primary-strong);
   }
 
+  /* Honeypot: display: none, as Formspree recommends. Bots read the HTML, not
+     the styling, so they still fill it; browser autofill does not. */
+  .gotcha {
+    display: none;
+  }
+
+  /* Field and sending errors, in the design system's input-error style. */
+  .field-error,
+  .form-error {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--body-sm-size);
+    line-height: var(--body-sm-lh);
+    color: var(--error);
+  }
+
+  .form-error {
+    margin-top: var(--space-sm);
+  }
+
+  input[aria-invalid="true"],
+  textarea[aria-invalid="true"] {
+    border-color: var(--error);
+  }
+
+  /* The thank-you block that takes the form's place once a message is sent.
+     Both are flex boxes, so the hidden attribute needs help to win. */
+  .form[hidden],
+  .sent[hidden] {
+    display: none;
+  }
+
+  .sent {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 415px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .sent-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--body-lg-size);
+    font-weight: var(--weight-regular);
+    line-height: 1.55;
+    color: var(--sounding-ink);
+  }
+
+  /* Focus lands here after sending, for screen readers; it is not in the Tab
+     order, so the browser's focus ring would only be noise. */
+  .sent-title:focus {
+    outline: none;
+  }
+
+  .sent-label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--transport-size);
+    margin: 0;
+    padding: 0 var(--space-md);
+    border-radius: var(--radius-control);
+    background: var(--success);
+    color: var(--text-on-primary);
+    font-family: var(--font-sans);
+    font-size: var(--label-caps-size);
+    font-weight: var(--weight-bold);
+    line-height: var(--label-caps-lh);
+    letter-spacing: var(--label-caps-ls);
+    text-transform: uppercase;
+  }
+
   @media (hover: hover) and (width >= 720px) {
-    .send:hover {
+    .send:not(:disabled):hover {
       transform: scale(1.02);
     }
   }
@@ -205,6 +426,10 @@ const t = ui[localeOf(Astro)];
 
     .actions {
       padding-top: 20px;
+    }
+
+    .sent {
+      gap: var(--space-md);
     }
   }
 </style>
