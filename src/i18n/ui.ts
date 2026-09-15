@@ -17,7 +17,7 @@ const en = {
   header: { menu: "Menu", primary: "Primary", language: "Language" },
   player: player.en,
   home: {
-    lede: "Four tracks written by Adrián over 20 years ago and recorded in a home studio over the span of 3 days in October 2025. Adrián only plays the guitar, it is The Fearless who fill the room. Press play on anything below.",
+    lede: "Four tracks written by Adrián over 20 years ago and recorded in a home studio over the span of 3 days in October 2025. We recommend you listen to the songs wearing headphones for maximum enjoyment. To begin, press play on anything below.",
     tracks: (n: number) => (n === 1 ? "1 track" : `${n} tracks`),
     tracksHeading: "Tracks",
     listenOn: "Listen on",
@@ -97,7 +97,7 @@ const es: Dictionary = {
   header: { menu: "Menú", primary: "Principal", language: "Idioma" },
   player: player.es,
   home: {
-    lede: "Cuatro temas que Adrián escribió hace más de 20 años, grabados en un estudio casero a lo largo de 3 días en octubre de 2025.",
+    lede: "Este EP está compuesto por cuatro temas escritos por Adrián hace más de 20 años y grabados en un estudio casero a lo largo de 3 días en octubre de 2025. Recomendamos escuchar las canciones con audífonos para disfrutarlas al máximo. Para empezar, dale al play en cualquiera de las opciones de abajo.",
     tracks: (n) => (n === 1 ? "1 tema" : `${n} temas`),
     tracksHeading: "Temas",
     listenOn: "Escuchar en",
