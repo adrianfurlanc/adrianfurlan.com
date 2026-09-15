@@ -1,26 +1,27 @@
-// Language helpers. English is the default and lives at "/", Spanish at "/es/".
+// Language helpers. Spanish is the default and lives at "/", English at "/en/".
 // Nothing here imports the dictionary, so client scripts can import this file
 // without shipping every string on the site to the browser.
 
 export type Locale = "en" | "es";
 
-export const locales: Locale[] = ["en", "es"];
-export const defaultLocale: Locale = "en";
+// Order is the order of the header toggle.
+export const locales: Locale[] = ["es", "en"];
+export const defaultLocale: Locale = "es";
 
 /** A piece of text in both languages, e.g. { en: "Cover", es: "Portada" }. */
 export type Localised = Record<Locale, string>;
 
 /**
  * The language of the page being rendered, from its address: anything under
- * /es/ is Spanish, everything else English. Pass the Astro global.
+ * /en/ is English, everything else Spanish. Pass the Astro global.
  */
 export const localeOf = (astro: {
   currentLocale: string | undefined;
-}): Locale => (astro.currentLocale === "es" ? "es" : "en");
+}): Locale => (astro.currentLocale === "en" ? "en" : "es");
 
 /**
- * Prefix a site path for a language: "/about" stays "/about" in English and
- * becomes "/es/about" in Spanish; the home page becomes "/es/".
+ * Prefix a site path for a language: "/about" stays "/about" in Spanish and
+ * becomes "/en/about" in English; the home page becomes "/en/".
  */
 export const localePath = (locale: Locale, path: string) => {
   if (locale === defaultLocale) return path;
@@ -29,7 +30,7 @@ export const localePath = (locale: Locale, path: string) => {
 
 /**
  * The language-free path of a page, for linking to the same page in the other
- * language: "/es/about/" and "/es/about" both give "/about", "/es/" gives "/".
+ * language: "/en/about/" and "/en/about" both give "/about", "/en/" gives "/".
  */
 export const pathWithoutLocale = (pathname: string) => {
   const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;

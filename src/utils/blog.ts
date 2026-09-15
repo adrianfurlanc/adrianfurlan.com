@@ -33,7 +33,7 @@ export const formatDate = (date: Date, locale: Locale) => {
 /** "2026-09-09", the machine-readable form for <time datetime>. */
 export const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 
-/** Address of a post's page in the given language: /blog/id or /es/blog/id. */
+/** Address of a post's page in the given language: /blog/id or /en/blog/id. */
 export const postHref = (id: string, locale: Locale) =>
   localePath(locale, `/blog/${id}`);
 
