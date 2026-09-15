@@ -13,7 +13,6 @@ const en = {
     about: "About",
     blog: "Blog",
     contact: "Contact",
-    listen: "Listen",
   },
   header: { menu: "Menu", primary: "Primary", language: "Language" },
   player: player.en,
@@ -21,6 +20,7 @@ const en = {
     lede: "Four tracks written by Adrián over 20 years ago and recorded in a home studio over the span of 3 days in October 2025. Adrián only plays the guitar, it is The Fearless who fill the room. Press play on anything below.",
     tracks: (n: number) => (n === 1 ? "1 track" : `${n} tracks`),
     tracksHeading: "Tracks",
+    listenOn: "Listen on",
     pressPlay: "Press play",
   },
   about: {
@@ -93,7 +93,6 @@ const es: Dictionary = {
     about: "Sobre mí",
     blog: "Blog",
     contact: "Contacto",
-    listen: "Escuchar",
   },
   header: { menu: "Menú", primary: "Principal", language: "Idioma" },
   player: player.es,
@@ -101,6 +100,7 @@ const es: Dictionary = {
     lede: "Cuatro temas que Adrián escribió hace más de 20 años, grabados en un estudio casero a lo largo de 3 días en octubre de 2025.",
     tracks: (n) => (n === 1 ? "1 tema" : `${n} temas`),
     tracksHeading: "Temas",
+    listenOn: "Escuchar en",
     pressPlay: "Dale al play",
   },
   about: {

@@ -8,6 +8,15 @@
 // `release.released[locale]`. Names and titles are never translated.
 
 import type { Localised } from "../i18n";
+import type { PlatformIcon } from "./platforms";
+
+export interface StreamingPlatform {
+  name: string;
+  icon: PlatformIcon;
+  href: string;
+  /** Optional one-liner under the name, e.g. why this link is different. */
+  note?: Localised;
+}
 
 export const release = {
   artist: "The Fearless",
@@ -27,6 +36,29 @@ export const release = {
     en: "Audio goes live with the release, December 2026.",
     es: "El audio estará disponible con el lanzamiento, en diciembre de 2026.",
   } satisfies Localised,
+  // Streaming platforms, the "Listen on" cards under the homepage track list:
+  // four streaming services plus Bandcamp, where listeners buy the EP and
+  // pay the artist directly. Replace each "#" with the platform's address.
+  // A "#" link stays on the page and goes nowhere; an empty address ("")
+  // hides that platform, and the whole section is left out while every
+  // address is empty. `icon` picks the mark drawn by
+  // src/components/PlatformIcon.astro. Platform names are brand names and
+  // are never translated.
+  streaming: [
+    { name: "Spotify", icon: "spotify", href: "#" },
+    { name: "Apple Music", icon: "apple-music", href: "#" },
+    { name: "YouTube Music", icon: "youtube-music", href: "#" },
+    { name: "Amazon Music", icon: "amazon-music", href: "#" },
+    {
+      name: "Bandcamp",
+      icon: "bandcamp",
+      href: "#",
+      note: {
+        en: "Pay the artist directly",
+        es: "Paga directamente al artista",
+      },
+    },
+  ] satisfies StreamingPlatform[],
 };
 
 export interface Track {

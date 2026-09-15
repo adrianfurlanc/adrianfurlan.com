@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import StreamingLinks from "../components/StreamingLinks.astro";
 import TrackList from "../components/TrackList.astro";
 import { release, tracks } from "../data/tracks";
 import cover from "../assets/coverart.jpg";
@@ -38,6 +39,7 @@ const t = ui[locale];
       note={release.audioNote[locale]}
       release={release.title}
     />
+    <StreamingLinks platforms={release.streaming} />
   </main>
   <SiteFooter />
 </Layout>

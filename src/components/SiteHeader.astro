@@ -62,27 +62,6 @@ const here = pathWithoutLocale(Astro.url.pathname);
             </a>
           ))
         }
-        <a
-          class="nav-link"
-          href="https://linktr.ee/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t.nav.listen}<svg
-            class="arrow"
-            width="11"
-            height="11"
-            viewBox="0 0 12 12"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="square"
-            aria-hidden="true"
-          >
-            <path d="M3.25 8.75 L8.75 3.25"></path>
-            <path d="M4.75 3.25 H8.75 V7.25"></path>
-          </svg>
-        </a>
       </nav>
       <div class="lang" role="group" aria-label={t.header.language}>
         {
@@ -184,11 +163,6 @@ const here = pathWithoutLocale(Astro.url.pathname);
 
   .nav-link:hover {
     color: var(--celadon);
-  }
-
-  .arrow {
-    margin-left: 6px;
-    flex: none;
   }
 
   .lang {

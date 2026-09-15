@@ -1,0 +1,21 @@
+---
+// A streaming platform's mark, drawn in the current text colour.
+import { paths, type PlatformIcon } from "../data/platforms";
+
+interface Props {
+  icon: PlatformIcon;
+  size?: number;
+}
+
+const { icon, size = 28 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="currentColor"
+  aria-hidden="true"
+>
+  <path d={paths[icon]}></path>
+</svg>

@@ -73,7 +73,9 @@ const labels = player[localeOf(Astro)];
       / 56px 28px 1fr 64px 56px 44px;
     gap: 0 var(--space-md);
     align-items: center;
+    margin-top: -1px;
     padding: 12px 0;
+    border-top: 1px solid transparent;
     border-bottom: 1px solid var(--light-blue);
     transition:
       background-color var(--transition-wash),
@@ -253,6 +255,17 @@ const labels = player[localeOf(Astro)];
 
     .row[data-state="off"]:hover {
       background-color: var(--foam);
+    }
+
+    /* The last row's rule would scale with it; hide it while hovered. */
+    .row:last-child:hover {
+      border-bottom-color: transparent;
+    }
+
+    /* Every row but the first gets its own top rule while hovered, so the
+       rule frames the row and scales with it. */
+    .row:not(:first-child):hover {
+      border-top-color: var(--light-blue);
     }
   }
 
