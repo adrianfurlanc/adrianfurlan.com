@@ -3,7 +3,8 @@
 // list. Platforms with an empty address are skipped, and
 // the whole section is left out when none has one. Each card's mark takes
 // the platform's brand colour, passed in as --brand; the border rests in
-// Deep Water and takes the brand colour on hover.
+// Deep Water and takes the brand colour on hover. Phones have no hover, so
+// there the border is in the brand colour from the start.
 import PlatformIcon from "./PlatformIcon.astro";
 import { brandColors } from "../data/platforms";
 import type { StreamingPlatform } from "../data/tracks";
@@ -180,24 +181,37 @@ const shown = platforms.filter((platform) => platform.href);
     }
 
     .grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 8px;
       margin-top: 12px;
     }
 
+    /* Phones: one compact full-width row per platform, mark left, name and
+       note beside it, arrow at the end, like the track rows above. */
     .card {
-      min-height: 112px;
-      padding: 14px;
+      grid-template:
+        "mark name arrow" auto
+        "mark note arrow" auto / auto 1fr auto;
+      align-content: center;
+      align-items: center;
+      column-gap: 10px;
+      min-height: 0;
+      padding: 10px 12px;
+      border-color: var(--brand, var(--deep-water));
     }
 
-    /* An odd fifth card takes the full row instead of sitting alone. */
-    .card:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
+    .mark svg {
+      width: 20px;
+      height: 20px;
     }
 
     .name {
-      margin-top: var(--space-md);
-      font-size: var(--body-lg-size);
+      margin-top: 0;
+      font-size: var(--body-md-size);
+    }
+
+    .note {
+      margin-top: 2px;
     }
   }
 </style>
