@@ -5,6 +5,11 @@ import SiteFooter from "../components/SiteFooter.astro";
 import TrackList from "../components/TrackList.astro";
 import { release, tracks } from "../data/tracks";
 import cover from "../assets/coverart.jpg";
+import { localeOf } from "../i18n";
+import { ui } from "../i18n/ui";
+
+const locale = localeOf(Astro);
+const t = ui[locale];
 ---
 
 <Layout>
@@ -12,20 +17,15 @@ import cover from "../assets/coverart.jpg";
   <main class="page">
     <section class="hero">
       <div class="cover">
-        <span class="caption">{release.coverCaption}</span>
+        <span class="caption">{release.coverCaption[locale]}</span>
       </div>
       <p class="label">{release.artist}</p>
       <h1 class="title">{release.title}</h1>
-      <p class="lede">
-        Four tracks written by Adrián over 20 years ago and recorded in Jaime's
-        home studio over the span of 3 days in October 2025. Adrián only plays
-        the guitar, it is The Fearless who fill the room. Press play on anything
-        below.
-      </p>
+      <p class="lede">{t.home.lede}</p>
       <p class="release-meta">
-        <span>{release.released}</span>
+        <span>{release.released[locale]}</span>
         <span aria-hidden="true">·</span>
-        <span>{release.trackCount} tracks</span>
+        <span>{t.home.tracks(release.trackCount)}</span>
         <span aria-hidden="true">·</span>
         <span>{release.runningTime}</span>
       </p>
@@ -34,8 +34,8 @@ import cover from "../assets/coverart.jpg";
       tracks={tracks}
       year={release.year}
       coverSrc={cover.src}
-      coverAlt={release.coverCaption}
-      note={release.audioNote}
+      coverAlt={release.coverCaption[locale]}
+      note={release.audioNote[locale]}
       release={release.title}
     />
   </main>
@@ -118,6 +118,7 @@ import cover from "../assets/coverart.jpg";
   .release-meta {
     grid-area: meta;
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     margin: 26px 0 0;
     padding-top: 14px;

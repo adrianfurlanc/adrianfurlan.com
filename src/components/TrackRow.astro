@@ -1,4 +1,7 @@
 ---
+import { localeOf } from "../i18n";
+import { player } from "../i18n/player";
+
 interface Props {
   num: string;
   slug: string;
@@ -12,6 +15,7 @@ interface Props {
 
 const { num, slug, title, duration, year, coverSrc, coverAlt, release } =
   Astro.props;
+const labels = player[localeOf(Astro)];
 ---
 
 <div
@@ -36,7 +40,7 @@ const { num, slug, title, duration, year, coverSrc, coverAlt, release } =
       class="seek"
       role="slider"
       tabindex="0"
-      aria-label="Seek"
+      aria-label={labels.seek}
       aria-valuemin="0"
       aria-valuemax="100"
       aria-valuenow="0"
@@ -52,7 +56,7 @@ const { num, slug, title, duration, year, coverSrc, coverAlt, release } =
   <button
     class="transport"
     type="button"
-    aria-label="Play"
+    aria-label={labels.play}
     aria-pressed="false"
   >
     <span class="icon-play"></span>

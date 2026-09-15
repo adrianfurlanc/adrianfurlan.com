@@ -2,6 +2,10 @@
 // The persistent player. Rendered once in Layout.astro with transition:persist,
 // so the same element (and its playing <audio>) survives client-side navigation.
 // Hidden until the first track is played; sits in the page flow above the footer.
+import { localeOf } from "../i18n";
+import { player } from "../i18n/player";
+
+const labels = player[localeOf(Astro)];
 ---
 
 <div class="player-bar" data-player transition:persist="player" hidden>
@@ -9,7 +13,7 @@
     <button
       class="transport"
       type="button"
-      aria-label="Play"
+      aria-label={labels.play}
       aria-pressed="false"
     >
       <span class="icon-play"></span>
@@ -29,7 +33,7 @@
         class="scrubber"
         role="slider"
         tabindex="0"
-        aria-label="Seek"
+        aria-label={labels.seek}
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow="0"
@@ -42,6 +46,8 @@
 </div>
 
 <script>
+  import { playerLabels } from "../i18n/player";
+
   // The site's one audio player. It owns the single <audio> element in the
   // bar, keeps one track playing at a time, and paints both the bar and any
   // track rows on the current page. Rows are re-bound on every page load
@@ -88,9 +94,23 @@
       release: row.dataset.release ?? "",
     });
 
+    // Labels follow the page's language, read fresh each time because the
+    // bar outlives the page it was first painted on.
+    const labels = () => playerLabels(document.documentElement.lang);
+
     const paintButton = (target: Element, playing: boolean) => {
       target.setAttribute("aria-pressed", String(playing));
-      target.setAttribute("aria-label", playing ? "Pause" : "Play");
+      target.setAttribute(
+        "aria-label",
+        playing ? labels().pause : labels().play,
+      );
+    };
+
+    // The bar's own labels, repainted on every page load so a language switch
+    // reaches the persisted bar too, even before any track has played.
+    const paintLabels = () => {
+      paintButton(button, current !== null && !audio.paused);
+      scrubber.setAttribute("aria-label", labels().seek);
     };
 
     const paintBar = () => {
@@ -259,6 +279,7 @@
         });
         bindSeek(seek);
       });
+      paintLabels();
       paintRows();
     };
 

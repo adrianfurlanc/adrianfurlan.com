@@ -3,16 +3,30 @@
 // Audio contract: each track's file is expected at public/audio/<slug>.mp3
 // (for example public/audio/trippy.mp3). Drop the files in and the player
 // picks them up with no code change. Until then, pressing play does nothing.
+//
+// Fields that are sentences carry both languages; pages pick one with
+// `release.released[locale]`. Names and titles are never translated.
+
+import type { Localised } from "../i18n";
 
 export const release = {
   artist: "The Fearless",
   title: "The Timeless EP",
-  released: "December 2026",
+  released: {
+    en: "December 2026",
+    es: "diciembre de 2026",
+  } satisfies Localised,
   trackCount: 4,
   runningTime: "12:43",
   year: "2026",
-  coverCaption: "The Timeless EP cover",
-  audioNote: "Audio goes live with the release, December 2026.",
+  coverCaption: {
+    en: "The Timeless EP cover",
+    es: "Portada de The Timeless EP",
+  } satisfies Localised,
+  audioNote: {
+    en: "Audio goes live with the release, December 2026.",
+    es: "El audio estará disponible con el lanzamiento, en diciembre de 2026.",
+  } satisfies Localised,
 };
 
 export interface Track {

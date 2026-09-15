@@ -1,16 +1,29 @@
 ---
+import { localeOf, localePath, locales, pathWithoutLocale } from "../i18n";
+import { ui } from "../i18n/ui";
+
 interface Props {
   current?: "home" | "about" | "blog" | "contact";
 }
 
 const { current } = Astro.props;
+const locale = localeOf(Astro);
+const t = ui[locale];
 
 const links = [
-  { key: "home", label: "Home", href: "/" },
-  { key: "about", label: "About", href: "/about" },
-  { key: "blog", label: "Blog", href: "/blog" },
-  { key: "contact", label: "Contact", href: "/contact" },
+  { key: "home", label: t.nav.home, href: localePath(locale, "/") },
+  { key: "about", label: t.nav.about, href: localePath(locale, "/about") },
+  { key: "blog", label: t.nav.blog, href: localePath(locale, "/blog") },
+  {
+    key: "contact",
+    label: t.nav.contact,
+    href: localePath(locale, "/contact"),
+  },
 ] as const;
+
+// This page's address without its language, so the EN/ES toggle can link to
+// the same page in the other language.
+const here = pathWithoutLocale(Astro.url.pathname);
 ---
 
 <header class="site-header">
@@ -18,7 +31,7 @@ const links = [
     <button
       class="menu-toggle"
       type="button"
-      aria-label="Menu"
+      aria-label={t.header.menu}
       aria-expanded="false"
       aria-controls="primary-nav"
     >
@@ -35,9 +48,9 @@ const links = [
         <path d="M1 1.5h20M1 8h20M1 14.5h20"></path>
       </svg>
     </button>
-    <a class="wordmark" href="/">Adrián Furlan</a>
+    <a class="wordmark" href={localePath(locale, "/")}>{t.site.name}</a>
     <div class="right">
-      <nav class="nav" id="primary-nav" aria-label="Primary">
+      <nav class="nav" id="primary-nav" aria-label={t.header.primary}>
         {
           links.map((link) => (
             <a
@@ -55,7 +68,7 @@ const links = [
           target="_blank"
           rel="noopener noreferrer"
         >
-          Listen<svg
+          {t.nav.listen}<svg
             class="arrow"
             width="11"
             height="11"
@@ -71,9 +84,20 @@ const links = [
           </svg>
         </a>
       </nav>
-      <div class="lang" role="group" aria-label="Language">
-        <a class="lang-option" aria-current="true">EN</a>
-        <a class="lang-option">ES</a>
+      <div class="lang" role="group" aria-label={t.header.language}>
+        {
+          locales.map((option) => (
+            <a
+              class="lang-option"
+              href={localePath(option, here)}
+              hreflang={option}
+              lang={option}
+              aria-current={option === locale ? "true" : undefined}
+            >
+              {option.toUpperCase()}
+            </a>
+          ))
+        }
       </div>
     </div>
   </div>

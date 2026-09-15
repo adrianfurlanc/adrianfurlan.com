@@ -20,4 +20,20 @@ const blog = defineCollection({
     }),
 });
 
-export const collections = { blog };
+// Spanish versions of posts: one Markdown file per post in src/content/blog-es/,
+// named exactly like the English post it translates. A file carries only the
+// words (title, excerpt, caption, body); the date comes from the English post
+// so the two can never disagree, and a missing `image` falls back to the
+// English photo. The pattern skips files starting with "_" (the folder's README).
+const blogEs = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.md", base: "./src/content/blog-es" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      excerpt: z.string(),
+      caption: z.string(),
+      image: image().optional(),
+    }),
+});
+
+export const collections = { blog, blogEs };

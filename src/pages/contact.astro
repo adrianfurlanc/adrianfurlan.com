@@ -2,16 +2,18 @@
 import Layout from "../layouts/Layout.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import { localeOf } from "../i18n";
+import { ui } from "../i18n/ui";
+
+const t = ui[localeOf(Astro)];
 ---
 
-<Layout title="Contact · Adrián Furlan">
+<Layout title={`${t.contact.title} · ${t.site.name}`}>
   <SiteHeader current="contact" />
   <main class="page">
     <div class="intro">
-      <h1 class="title">Contact</h1>
-      <p class="lede">
-        For shows, press, or anything else. Replies within a few days.
-      </p>
+      <h1 class="title">{t.contact.title}</h1>
+      <p class="lede">{t.contact.lede}</p>
     </div>
     {
       /* Visual only for now. To wire it up: give the form an action and method
@@ -19,22 +21,22 @@ import SiteFooter from "../components/SiteFooter.astro";
     }
     <form class="form" novalidate>
       <div class="field">
-        <label for="name">Name</label>
+        <label for="name">{t.contact.name}</label>
         <input id="name" name="name" type="text" autocomplete="name" />
       </div>
       <div class="field">
-        <label for="email">Email</label>
+        <label for="email">{t.contact.email}</label>
         <input id="email" name="email" type="email" autocomplete="email" />
       </div>
       <div class="field">
-        <label for="message">Message</label>
+        <label for="message">{t.contact.message}</label>
         <textarea
           id="message"
           name="message"
-          placeholder="Shows, press, or anything else."></textarea>
+          placeholder={t.contact.placeholder}></textarea>
       </div>
       <div class="actions">
-        <button class="send" type="button">Send</button>
+        <button class="send" type="button">{t.contact.send}</button>
       </div>
     </form>
   </main>

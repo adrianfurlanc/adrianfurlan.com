@@ -5,7 +5,15 @@ import type { CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
-import { byNewest, formatDate, isoDate, postHref } from "../../utils/blog";
+import { localeOf, localePath } from "../../i18n";
+import { ui } from "../../i18n/ui";
+import {
+  byNewest,
+  formatDate,
+  isoDate,
+  localisedPost,
+  postHref,
+} from "../../utils/blog";
 
 // One page per post. Posts are sorted newest first so each page also
 // knows its neighbours: "newer" is the next post, "older" the previous.
@@ -24,59 +32,83 @@ interface Props {
 }
 
 const { post, newer, older } = Astro.props;
-const { Content } = await render(post);
+const locale = localeOf(Astro);
+const t = ui[locale];
 
-const words = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+// In Spanish, a twin file in src/content/blog-es/ (same filename) supplies the
+// words and the body; dates and the order always come from the English posts.
+const twins = new Map<string, CollectionEntry<"blogEs">>();
+if (locale === "es") {
+  for (const entry of await getCollection("blogEs")) twins.set(entry.id, entry);
+}
+const twin = twins.get(post.id);
+const shown = localisedPost(post, twin);
+
+// The Previous/Next links follow the same rule for their titles.
+const olderTitle = older && localisedPost(older, twins.get(older.id)).title;
+const newerTitle = newer && localisedPost(newer, twins.get(newer.id)).title;
+const { Content } = twin ? await render(twin) : await render(post);
+
+const body = (twin ?? post).body ?? "";
+const words = body.trim().split(/\s+/).filter(Boolean).length;
 const readTime = Math.max(1, Math.ceil(words / 200));
 ---
 
-<Layout title={`${post.data.title} · Adrián Furlan`}>
+<Layout title={`${shown.title} · ${t.site.name}`}>
   <SiteHeader current="blog" />
   <main class="page">
-    {!newer && <p class="label latest">Latest post</p>}
+    {!newer && <p class="label latest">{t.blog.latest}</p>}
     {
-      post.data.image ? (
+      shown.image ? (
         <Image
           class="figure figure-photo"
-          src={post.data.image}
-          alt={post.data.caption}
+          src={shown.image}
+          alt={shown.caption}
           widths={[720, 1440]}
           sizes="(width < 720px) calc(100vw - 40px), 800px"
           format="webp"
         />
       ) : (
         <div class="figure">
-          <span class="caption">{post.data.caption}</span>
+          <span class="caption">{shown.caption}</span>
         </div>
       )
     }
     <article class="post">
-      <h1 class="title">{post.data.title}</h1>
+      <h1 class="title">{shown.title}</h1>
       <p class="meta">
-        <span>{readTime} min read</span>
+        <span>{t.post.readTime(readTime)}</span>
         <span aria-hidden="true">·</span>
         <time class="posted" datetime={isoDate(post.data.date)}>
-          {formatDate(post.data.date)}
+          {formatDate(post.data.date, locale)}
         </time>
       </p>
+      {
+        locale === "es" && !twin && (
+          <p class="meta untranslated">{t.post.untranslated}</p>
+        )
+      }
       <div class="body post-body">
         <Content />
       </div>
 
-      <nav class="neighbours" aria-label="Previous and next posts">
+      <nav class="neighbours" aria-label={t.post.neighbours}>
         {
           older ? (
-            <a class="neighbour neighbour-link" href={postHref(older.id)}>
-              <span class="label">Previous</span>
-              <span class="neighbour-title">{older.data.title}</span>
+            <a
+              class="neighbour neighbour-link"
+              href={postHref(older.id, locale)}
+            >
+              <span class="label">{t.post.previous}</span>
+              <span class="neighbour-title">{olderTitle}</span>
               <time class="neighbour-date" datetime={isoDate(older.data.date)}>
-                {formatDate(older.data.date)}
+                {formatDate(older.data.date, locale)}
               </time>
             </a>
           ) : (
             <div class="neighbour">
-              <span class="label">Previous</span>
-              <p class="neighbour-note">You are reading the oldest post.</p>
+              <span class="label">{t.post.previous}</span>
+              <p class="neighbour-note">{t.post.oldest}</p>
             </div>
           )
         }
@@ -84,25 +116,25 @@ const readTime = Math.max(1, Math.ceil(words / 200));
           newer ? (
             <a
               class="neighbour neighbour-link neighbour-next"
-              href={postHref(newer.id)}
+              href={postHref(newer.id, locale)}
             >
-              <span class="label">Next</span>
-              <span class="neighbour-title">{newer.data.title}</span>
+              <span class="label">{t.post.next}</span>
+              <span class="neighbour-title">{newerTitle}</span>
               <time class="neighbour-date" datetime={isoDate(newer.data.date)}>
-                {formatDate(newer.data.date)}
+                {formatDate(newer.data.date, locale)}
               </time>
             </a>
           ) : (
             <div class="neighbour neighbour-next">
-              <span class="label">Next</span>
-              <p class="neighbour-note">You are reading the newest post.</p>
+              <span class="label">{t.post.next}</span>
+              <p class="neighbour-note">{t.post.newest}</p>
             </div>
           )
         }
       </nav>
 
       <div class="all-posts">
-        <a class="all-posts-link" href="/blog">
+        <a class="all-posts-link" href={localePath(locale, "/blog")}>
           <svg
             class="arrow"
             width="14"
@@ -117,7 +149,7 @@ const readTime = Math.max(1, Math.ceil(words / 200));
             <path d="M13.5 5.5 H2"></path>
             <path d="M5.5 2 L2 5.5 L5.5 9"></path>
           </svg>
-          All posts
+          {t.post.allPosts}
         </a>
       </div>
     </article>
@@ -136,21 +168,22 @@ const readTime = Math.max(1, Math.ceil(words / 200));
     const then = Date.parse(`${posted.dateTime}T00:00:00Z`);
     const now = new Date();
     const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-    const days = Math.round((today - then) / 86_400_000);
+    const days = Math.max(0, Math.round((today - then) / 86_400_000));
+
+    // The browser knows how to say "3 days ago" or "hace 3 días" in the
+    // page's language. "auto" gives "today"/"yesterday" (hoy/ayer) for days;
+    // "always" keeps "1 month ago" rather than "last month".
+    const lang = document.documentElement.lang || "en";
+    const named = new Intl.RelativeTimeFormat(lang, { numeric: "auto" });
+    const counted = new Intl.RelativeTimeFormat(lang, { numeric: "always" });
 
     let label: string;
-    if (days <= 0) {
-      label = "today";
-    } else if (days === 1) {
-      label = "yesterday";
-    } else if (days < 30) {
-      label = `${days} days ago`;
+    if (days < 30) {
+      label = named.format(0 - days, "day");
     } else if (days < 365) {
-      const months = Math.floor(days / 30);
-      label = months === 1 ? "1 month ago" : `${months} months ago`;
+      label = counted.format(0 - Math.floor(days / 30), "month");
     } else {
-      const years = Math.floor(days / 365);
-      label = years === 1 ? "1 year ago" : `${years} years ago`;
+      label = counted.format(0 - Math.floor(days / 365), "year");
     }
 
     posted.title = (posted.textContent ?? "").trim();
@@ -233,6 +266,11 @@ const readTime = Math.max(1, Math.ceil(words / 200));
     color: var(--chart-grey);
   }
 
+  /* Shown on the Spanish page of a post that has no Spanish twin yet. */
+  .untranslated {
+    margin-top: 8px;
+  }
+
   .body {
     margin-top: 28px;
     padding-top: 28px;
@@ -243,7 +281,7 @@ const readTime = Math.max(1, Math.ceil(words / 200));
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--gutter) var(--space-lg);
-    margin-top: var(--space-sm);
+    margin-top: var(--space-lg);
     padding: 28px 0;
     border-top: 1px solid var(--light-blue);
   }
@@ -365,7 +403,7 @@ const readTime = Math.max(1, Math.ceil(words / 200));
       justify-content: space-between;
       align-items: baseline;
       gap: var(--gutter);
-      margin-top: var(--space-xs);
+      margin-top: var(--space-lg);
     }
 
     .neighbour-title,

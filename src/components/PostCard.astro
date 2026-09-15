@@ -1,6 +1,8 @@
 ---
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
+import { localeOf } from "../i18n";
+import { ui } from "../i18n/ui";
 
 interface Props {
   title: string;
@@ -13,6 +15,7 @@ interface Props {
 }
 
 const { title, href, date, dateTime, excerpt, caption, image } = Astro.props;
+const t = ui[localeOf(Astro)];
 ---
 
 <article class="card">
@@ -37,7 +40,7 @@ const { title, href, date, dateTime, excerpt, caption, image } = Astro.props;
   <p class="excerpt">{excerpt}</p>
   <div class="read">
     <a class="read-link" href={href}>
-      Read<svg
+      {t.blog.read}<svg
         class="arrow"
         width="14"
         height="11"
@@ -130,10 +133,12 @@ const { title, href, date, dateTime, excerpt, caption, image } = Astro.props;
     color: var(--sounding-ink);
   }
 
+  /* Pushed to the card's bottom so the link and its rule line up across a row of cards. */
   .read {
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: auto;
+    padding-top: 20px;
     padding-bottom: var(--space-md);
     border-bottom: 1px solid var(--light-blue);
   }

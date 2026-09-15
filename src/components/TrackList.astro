@@ -1,6 +1,8 @@
 ---
 import TrackRow from "./TrackRow.astro";
 import type { Track } from "../data/tracks";
+import { localeOf } from "../i18n";
+import { ui } from "../i18n/ui";
 
 interface Props {
   tracks: Track[];
@@ -12,12 +14,13 @@ interface Props {
 }
 
 const { tracks, year, coverSrc, coverAlt, note, release } = Astro.props;
+const t = ui[localeOf(Astro)];
 ---
 
 <section class="tracks" aria-labelledby="tracks-title">
   <div class="head">
-    <h2 class="heading" id="tracks-title">Tracks</h2>
-    <span class="label">Press play</span>
+    <h2 class="heading" id="tracks-title">{t.home.tracksHeading}</h2>
+    <span class="label">{t.home.pressPlay}</span>
   </div>
   <div class="list">
     {

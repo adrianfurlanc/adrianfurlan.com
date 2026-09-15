@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import PlayerBar from "../components/PlayerBar.astro";
+import { localeOf } from "../i18n";
 import "../styles/tokens.css";
 import "../styles/global.css";
 
@@ -9,10 +10,13 @@ interface Props {
 }
 
 const { title = "Adrián Furlan" } = Astro.props;
+
+// The page's language, from its address: /es/… is Spanish, the rest English.
+const locale = localeOf(Astro);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />

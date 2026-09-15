@@ -1,0 +1,13 @@
+---
+// Spanish blog list: the English page rendered under /es/blog/. It reuses the
+// English page's list of pages, so /es/blog/2 exists whenever /blog/2 does.
+import type { InferGetStaticPropsType } from "astro";
+import Page, { getStaticPaths } from "../../blog/[...page].astro";
+
+export { getStaticPaths };
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const props: Props = Astro.props;
+---
+
+<Page {...props} />

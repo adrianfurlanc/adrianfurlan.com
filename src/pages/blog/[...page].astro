@@ -1,55 +1,108 @@
 ---
-import { getCollection } from "astro:content";
+import type { GetStaticPathsOptions, Page } from "astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 import PostCard from "../../components/PostCard.astro";
-import { byNewest, formatDate, isoDate, postHref } from "../../utils/blog";
+import { localeOf } from "../../i18n";
+import { ui } from "../../i18n/ui";
+import {
+  blogPageHref,
+  byNewest,
+  formatDate,
+  isoDate,
+  localisedPost,
+  postHref,
+} from "../../utils/blog";
 
-// Newest first. The first post is featured; the rest fill the grid.
-const posts = (await getCollection("blog")).sort(byNewest);
-const [featured, ...earlier] = posts;
+// Five posts per page, newest first. Astro's paginate() splits the list into
+// pages: this one file makes /blog (page 1) and /blog/2, /blog/3, … after it.
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  const posts = (await getCollection("blog")).sort(byNewest);
+  return paginate(posts, { pageSize: 5 });
+}
+
+interface Props {
+  page: Page<CollectionEntry<"blog">>;
+}
+
+const { page } = Astro.props;
+const locale = localeOf(Astro);
+const t = ui[locale];
+
+// In Spanish, a twin file in src/content/blog-es/ (same filename) supplies the
+// words; the date and the order always come from the English post.
+const twins = new Map<string, CollectionEntry<"blogEs">>();
+if (locale === "es") {
+  for (const twin of await getCollection("blogEs")) twins.set(twin.id, twin);
+}
+const shown = page.data.map((post) => ({
+  id: post.id,
+  date: post.data.date,
+  ...localisedPost(post, twins.get(post.id)),
+}));
+
+// Page 1 shows its first post large; later pages are just the grid.
+const first = page.currentPage === 1;
+const featured = first ? shown[0] : undefined;
+const grid = first ? shown.slice(1) : shown;
+const pageOf = t.blog.pageOf(page.currentPage, page.lastPage);
+const title = first
+  ? `${t.blog.title} · ${t.site.name}`
+  : `${t.blog.title} · ${pageOf} · ${t.site.name}`;
+
+// The controls show up to five page numbers around the current one; phones
+// show three of them (the rest get the class the phone styles hide).
+const clamp = (n: number, lo: number, hi: number) =>
+  Math.min(Math.max(n, lo), hi);
+const current = page.currentPage;
+const last = page.lastPage;
+const start = clamp(current - 2, 1, Math.max(1, last - 4));
+const end = Math.min(last, start + 4);
+const phoneStart = clamp(current - 1, 1, Math.max(1, last - 2));
+const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
 ---
 
-<Layout title="Blog · Adrián Furlan">
+<Layout title={title}>
   <SiteHeader current="blog" />
   <main class="page">
     <div class="intro">
-      <h1 class="title">Blog</h1>
-      <p class="lede">Notes on the record, the band, the road.</p>
+      <h1 class="title">{t.blog.title}</h1>
+      <p class="lede">{t.blog.lede}</p>
     </div>
-    <hr class="rule" />
+    {first && <hr class="rule" />}
 
     {
       featured && (
         <section class="featured" aria-labelledby="latest-title">
-          <p class="label featured-label">Latest post</p>
-          {featured.data.image ? (
+          <p class="label featured-label">{t.blog.latest}</p>
+          {featured.image ? (
             <Image
               class="featured-figure featured-photo"
-              src={featured.data.image}
-              alt={featured.data.caption}
+              src={featured.image}
+              alt={featured.caption}
               widths={[400, 800]}
               sizes="(width < 720px) calc(100vw - 40px), 400px"
               format="webp"
             />
           ) : (
             <div class="featured-figure">
-              <span class="caption">{featured.data.caption}</span>
+              <span class="caption">{featured.caption}</span>
             </div>
           )}
           <div class="featured-body">
             <h2 class="featured-title" id="latest-title">
-              <a href={postHref(featured.id)}>{featured.data.title}</a>
+              <a href={postHref(featured.id, locale)}>{featured.title}</a>
             </h2>
-            <p class="featured-excerpt">{featured.data.excerpt}</p>
-            <time class="date" datetime={isoDate(featured.data.date)}>
-              {formatDate(featured.data.date)}
+            <p class="featured-excerpt">{featured.excerpt}</p>
+            <time class="date" datetime={isoDate(featured.date)}>
+              {formatDate(featured.date, locale)}
             </time>
             <div class="featured-read">
-              <a class="read-link" href={postHref(featured.id)}>
-                Read
+              <a class="read-link" href={postHref(featured.id, locale)}>
+                {t.blog.read}
                 <svg
                   class="arrow"
                   width="14"
@@ -71,72 +124,103 @@ const [featured, ...earlier] = posts;
       )
     }
 
-    <div class="earlier-head">
+    <div class:list={["earlier-head", { "page-head": !first }]}>
       <hr class="rule" />
-      <p class="label">Earlier posts</p>
+      <p class="label">{first ? t.blog.earlier : pageOf}</p>
     </div>
     <div class="grid">
       {
-        earlier.map((post) => (
+        grid.map((post) => (
           <PostCard
-            title={post.data.title}
-            href={postHref(post.id)}
-            date={formatDate(post.data.date)}
-            dateTime={isoDate(post.data.date)}
-            excerpt={post.data.excerpt}
-            caption={post.data.caption}
-            image={post.data.image}
+            title={post.title}
+            href={postHref(post.id, locale)}
+            date={formatDate(post.date, locale)}
+            dateTime={isoDate(post.date)}
+            excerpt={post.excerpt}
+            caption={post.caption}
+            image={post.image}
           />
         ))
       }
     </div>
 
     {
-      /* Decorative for now: there is only one page of posts. Make it real with Astro's paginate() when there are more. */
+      /* Only when there is more than one page. The arrows keep their <a> but lose the href on the first/last page. */
     }
-    <nav class="pagination" aria-label="Pagination">
-      <span class="page-prev" aria-disabled="true">
-        <svg
-          class="arrow"
-          width="14"
-          height="11"
-          viewBox="0 0 14 11"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="square"
-          aria-hidden="true"
-        >
-          <path d="M13.5 5.5 H2"></path>
-          <path d="M5.5 2 L2 5.5 L5.5 9"></path>
-        </svg>
-        <span>Prev<span class="prev-tail">ious</span></span>
-      </span>
-      <div class="pages">
-        <span class="page-num" aria-current="page">1</span>
-        <a class="page-num page-link">2</a>
-        <a class="page-num page-link">3</a>
-        <a class="page-num page-link page-num-wide">4</a>
-        <a class="page-num page-link page-num-wide">5</a>
-      </div>
-      <a class="page-next">
-        Next
-        <svg
-          class="arrow"
-          width="14"
-          height="11"
-          viewBox="0 0 14 11"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="square"
-          aria-hidden="true"
-        >
-          <path d="M0.5 5.5 H12"></path>
-          <path d="M8.5 2 L12 5.5 L8.5 9"></path>
-        </svg>
-      </a>
-    </nav>
+    {
+      last > 1 && (
+        <nav class="pagination" aria-label={t.blog.pagination}>
+          <a
+            class="page-prev"
+            href={current > 1 ? blogPageHref(current - 1, locale) : undefined}
+            aria-disabled={current > 1 ? undefined : "true"}
+          >
+            <svg
+              class="arrow"
+              width="14"
+              height="11"
+              viewBox="0 0 14 11"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M13.5 5.5 H2" />
+              <path d="M5.5 2 L2 5.5 L5.5 9" />
+            </svg>
+            <span>
+              {t.blog.prev}
+              <span class="prev-tail">{t.blog.prevTail}</span>
+            </span>
+          </a>
+          <div class="pages">
+            {numbers.map((n) =>
+              n === current ? (
+                <span class="page-num" aria-current="page">
+                  {n}
+                </span>
+              ) : (
+                <a
+                  class:list={[
+                    "page-num",
+                    "page-link",
+                    { "page-num-wide": n < phoneStart || n > phoneStart + 2 },
+                  ]}
+                  href={blogPageHref(n, locale)}
+                  aria-label={t.blog.pageNumber(n)}
+                >
+                  {n}
+                </a>
+              ),
+            )}
+          </div>
+          <a
+            class="page-next"
+            href={
+              current < last ? blogPageHref(current + 1, locale) : undefined
+            }
+            aria-disabled={current < last ? undefined : "true"}
+          >
+            {t.blog.next}
+            <svg
+              class="arrow"
+              width="14"
+              height="11"
+              viewBox="0 0 14 11"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M0.5 5.5 H12" />
+              <path d="M8.5 2 L12 5.5 L8.5 9" />
+            </svg>
+          </a>
+        </nav>
+      )
+    }
   </main>
   <SiteFooter />
 </Layout>
@@ -311,6 +395,12 @@ const [featured, ...earlier] = posts;
     margin-top: var(--space-xl);
   }
 
+  /* On pages 2+ there is no featured post above, so this head's own rule
+     stands in for the intro rule and sits at the same distance. */
+  .page-head {
+    margin-top: 0;
+  }
+
   .earlier-head .label {
     margin-top: var(--gutter);
   }
@@ -344,29 +434,31 @@ const [featured, ...earlier] = posts;
     letter-spacing: var(--label-caps-ls);
     text-transform: uppercase;
     text-decoration: none;
+    color: var(--deep-water);
     transition: color var(--transition-state);
   }
 
   .page-prev {
     justify-self: start;
-    color: var(--light-blue);
-    pointer-events: none;
-  }
-
-  .page-prev .arrow {
-    margin-left: 0;
   }
 
   .page-next {
     justify-self: end;
-    color: var(--deep-water);
-    cursor: pointer;
   }
 
+  .page-prev:hover,
   .page-next:hover {
     color: var(--title-hover);
   }
 
+  /* On the first or last page the arrow has nowhere to go: greyed, not clickable. */
+  .page-prev[aria-disabled="true"],
+  .page-next[aria-disabled="true"] {
+    color: var(--light-blue);
+    pointer-events: none;
+  }
+
+  .page-prev .arrow,
   .page-next .arrow {
     margin-left: 0;
   }
@@ -402,10 +494,6 @@ const [featured, ...earlier] = posts;
   .page-num[aria-current="page"] {
     background: var(--primary);
     color: var(--sleeve);
-  }
-
-  .page-link {
-    cursor: pointer;
   }
 
   .page-link:hover {
@@ -501,7 +589,7 @@ const [featured, ...earlier] = posts;
       padding: 13px 0;
     }
 
-    .earlier-head {
+    .earlier-head:not(.page-head) {
       display: none;
     }
 

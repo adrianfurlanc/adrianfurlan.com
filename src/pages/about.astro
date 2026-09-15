@@ -2,43 +2,22 @@
 import Layout from "../layouts/Layout.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import { localeOf } from "../i18n";
+import { ui } from "../i18n/ui";
 
-const lineup = [
-  { name: "Adrián Furlan", role: "Songwriter / Guitar" },
-  { name: "Jaime Pérez", role: "Bass" },
-  { name: "Zahir Chacín", role: "Vocals / Guitar" },
-];
+const locale = localeOf(Astro);
+const t = ui[locale];
+
+// Names never translate; the roles come from the dictionary in the same order.
+const names = ["Adrián Furlan", "Jaime Pérez", "Zahir Chacín"];
+const lineup = names.map((name, i) => ({ name, role: t.about.roles[i] }));
 ---
 
-<Layout title="About · Adrián Furlan">
+<Layout title={`${t.about.title} · ${t.site.name}`}>
   <SiteHeader current="about" />
   <main class="page">
-    <h1 class="title">About</h1>
-    <p class="prose">
-      Adrián Furlan is one of the members of the spanish indie rock band known
-      only as "The Fearless". Most of the band's initial rehearsals where at his
-      home in Valencia, Spain. The band later transitioned to rehearsing in a
-      professional recording studio as time went on.
-    </p>
-    <p class="prose">
-      The band formed in September 2024 after connecting with each other via the
-      Vampr mobile app. They rehearsed weekly and created an initial setlist of
-      seven songs, four of which were recorded in three sessions in October 2025
-      to form the basis of this EP.
-    </p>
-    <p class="prose">
-      Despite having several interim drummers, the band has never had a stable
-      presence in the drum department. If you are a drummer, enjoy the songs
-      posted here and would like to join us, please send me a message via this
-      website's contact form and I will try to respond within a couple of days.
-    </p>
-    <p class="prose">
-      The band is currently on hiatus. Our singer, Zahir, moved to Madrid at the
-      end of last year, and we haven't found a replacement for him just yet. If
-      you are a singer who can sing in English and would like to join the band,
-      use the contact form on this website to get in touch with me, and I
-      promise I'll get back to you.
-    </p>
+    <h1 class="title">{t.about.title}</h1>
+    {t.about.paragraphs.map((paragraph) => <p class="prose">{paragraph}</p>)}
     <hr class="rule" />
     <section class="band">
       <h2 class="band-name">The Fearless</h2>
@@ -52,10 +31,7 @@ const lineup = [
           ))
         }
       </ul>
-      <p class="credits">
-        Drums on the record by Murat Mumcuoglu and [drummer, name to come].
-      </p>
-      <p class="credits">Produced by VicsMix.</p>
+      {t.about.credits.map((line) => <p class="credits">{line}</p>)}
     </section>
   </main>
   <SiteFooter />
