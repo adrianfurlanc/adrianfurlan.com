@@ -20,21 +20,27 @@ const t = ui[localeOf(Astro)];
 
 <article class="card">
   {
-    image ? (
-      <Image
-        class="figure figure-photo"
-        src={image}
-        alt={caption}
-        widths={[400, 800]}
-        sizes="(width < 720px) calc(100vw - 40px), 400px"
-        format="webp"
-      />
-    ) : (
-      <div class="figure">
-        <span class="caption">{caption}</span>
-      </div>
-    )
+    /* The figure opens the post too. The title link is the one for keyboards
+      and screen readers, so this one is skipped by both. */
   }
+  <a class="figure-link" href={href} tabindex="-1" aria-hidden="true">
+    {
+      image ? (
+        <Image
+          class="figure figure-photo"
+          src={image}
+          alt={caption}
+          widths={[400, 800]}
+          sizes="(width < 720px) calc(100vw - 40px), 400px"
+          format="webp"
+        />
+      ) : (
+        <div class="figure">
+          <span class="caption">{caption}</span>
+        </div>
+      )
+    }
+  </a>
   <time class="date" datetime={dateTime}>{date}</time>
   <h3 class="title"><a href={href}>{title}</a></h3>
   <p class="excerpt">{excerpt}</p>
@@ -63,6 +69,12 @@ const t = ui[localeOf(Astro)];
     display: flex;
     flex-direction: column;
     transition: transform var(--transition-wash);
+  }
+
+  .figure-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
   }
 
   .figure {
