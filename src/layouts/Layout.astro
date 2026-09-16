@@ -46,6 +46,12 @@ const locale = localeOf(Astro);
   body {
     margin: 0;
     width: 100%;
+  }
+
+  /* The body grows with the page (global.css gives it a minimum of one
+     screen) rather than being pinned to one screen, so the sticky header
+     on phones has the whole page to stick to. */
+  html {
     height: 100%;
   }
 </style>

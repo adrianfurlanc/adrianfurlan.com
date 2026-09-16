@@ -54,14 +54,20 @@ const title = first
   : `${t.blog.title} · ${pageOf} · ${t.site.name}`;
 
 // The controls show up to five page numbers around the current one; phones
-// show three of them (the rest get the class the phone styles hide).
+// show three of them (the rest get the class the phone styles hide). Spanish
+// phones show only the current one, to leave room for the full "Anterior".
 const clamp = (n: number, lo: number, hi: number) =>
   Math.min(Math.max(n, lo), hi);
 const current = page.currentPage;
 const last = page.lastPage;
 const start = clamp(current - 2, 1, Math.max(1, last - 4));
 const end = Math.min(last, start + 4);
-const phoneStart = clamp(current - 1, 1, Math.max(1, last - 2));
+const phoneCount = locale === "es" ? 1 : 3;
+const phoneStart = clamp(
+  current - (phoneCount === 3 ? 1 : 0),
+  1,
+  Math.max(1, last - (phoneCount - 1)),
+);
 const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
 ---
 
@@ -194,7 +200,10 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
                   class:list={[
                     "page-num",
                     "page-link",
-                    { "page-num-wide": n < phoneStart || n > phoneStart + 2 },
+                    {
+                      "page-num-wide":
+                        n < phoneStart || n >= phoneStart + phoneCount,
+                    },
                   ]}
                   href={blogPageHref(n, locale)}
                   aria-label={t.blog.pageNumber(n)}
@@ -352,10 +361,6 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     transition: color var(--transition-state);
   }
 
-  .featured-title a:hover {
-    color: var(--title-hover);
-  }
-
   .featured-excerpt {
     margin: 28px 0 0;
     font-family: var(--font-serif);
@@ -395,10 +400,6 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     color: var(--deep-water);
     text-decoration: none;
     transition: color var(--transition-state);
-  }
-
-  .read-link:hover {
-    color: var(--title-hover);
   }
 
   .arrow {
@@ -461,11 +462,6 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     justify-self: end;
   }
 
-  .page-prev:hover,
-  .page-next:hover {
-    color: var(--title-hover);
-  }
-
   /* On the first or last page the arrow has nowhere to go: greyed, not clickable. */
   .page-prev[aria-disabled="true"],
   .page-next[aria-disabled="true"] {
@@ -518,6 +514,14 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
   @media (hover: hover) and (width >= 720px) {
+    /* Phones skip the green: a tap would flash it before the page changes. */
+    .featured-title a:hover,
+    .read-link:hover,
+    .page-prev:hover,
+    .page-next:hover {
+      color: var(--title-hover);
+    }
+
     .featured:hover {
       position: relative;
       z-index: 1;
@@ -545,14 +549,18 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
       padding-top: 36px;
     }
 
+    /* Page titles are 36px on phones, like "Sobre mí" on the About page. */
     .title {
-      font-size: var(--headline-sm-size);
+      font-size: 36px;
       line-height: 1.2;
       letter-spacing: var(--headline-sm-ls);
     }
 
+    /* Same reading size and line spacing as the About paragraphs on phones. */
     .lede {
       margin-top: 14px;
+      font-size: 21px;
+      line-height: var(--body-lg-lh);
     }
 
     .rule {
@@ -589,19 +597,26 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     .featured-title {
       margin-top: 20px;
       padding: 4px 0;
-      font-size: 26px;
+      font-size: 28px;
       line-height: 1.2;
     }
 
+    /* Same reading size and line spacing as the About paragraphs on phones. */
     .featured-excerpt {
       margin-top: 20px;
       padding: 4px 0;
+      font-size: 21px;
+      line-height: var(--body-lg-lh);
     }
 
     .featured-read {
       display: flex;
       justify-content: flex-end;
       padding: 13px 0;
+    }
+
+    .read-link {
+      font-size: 15px;
     }
 
     .earlier-head:not(.page-head) {
@@ -624,7 +639,7 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     .page-prev,
     .page-next {
       min-height: var(--transport-size);
-      font-size: 13px;
+      font-size: 15px;
     }
 
     .prev-tail {
@@ -634,7 +649,14 @@ const numbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     .page-num {
       width: var(--transport-size);
       height: var(--transport-size);
-      font-size: 15px;
+      font-size: 17px;
+      transition: none;
+    }
+
+    /* A tap counts as hover on phones: no lift or border, the number just switches. */
+    .page-link:hover {
+      border-color: transparent;
+      transform: none;
     }
 
     .page-num-wide {

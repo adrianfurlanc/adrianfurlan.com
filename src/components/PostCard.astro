@@ -132,10 +132,6 @@ const t = ui[localeOf(Astro)];
     transition: color var(--transition-state);
   }
 
-  .title a:hover {
-    color: var(--title-hover);
-  }
-
   .excerpt {
     margin: 28px 0 0;
     font-family: var(--font-serif);
@@ -170,16 +166,18 @@ const t = ui[localeOf(Astro)];
     transition: color var(--transition-state);
   }
 
-  .read-link:hover {
-    color: var(--title-hover);
-  }
-
   .arrow {
     margin-left: 8px;
     flex: none;
   }
 
   @media (hover: hover) and (width >= 720px) {
+    /* Phones skip the green: a tap would flash it before the page changes. */
+    .title a:hover,
+    .read-link:hover {
+      color: var(--title-hover);
+    }
+
     .card:hover {
       position: relative;
       z-index: 1;
@@ -214,22 +212,27 @@ const t = ui[localeOf(Astro)];
     .title {
       margin-top: 20px;
       padding: 4px 0;
-      font-size: 24px;
+      font-size: 26px;
       line-height: 1.2;
       letter-spacing: -0.01em;
     }
 
+    /* Same reading size and line spacing as the About paragraphs on phones. */
     .excerpt {
       margin-top: 20px;
       padding: 4px 0;
-      font-size: var(--body-md-size);
-      line-height: var(--body-md-lh);
+      font-size: 21px;
+      line-height: var(--body-lg-lh);
     }
 
     .read {
       margin-top: 20px;
       padding: 13px 0;
       border-bottom: 0;
+    }
+
+    .read-link {
+      font-size: 15px;
     }
   }
 </style>

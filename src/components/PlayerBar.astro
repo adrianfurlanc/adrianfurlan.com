@@ -149,7 +149,8 @@ const labels = player[localeOf(Astro)];
         const time = row.querySelector(".time") as HTMLElement;
         const seek = row.querySelector(".seek") as HTMLElement;
         row.dataset.state = playing ? "playing" : "paused";
-        glyph.textContent = playing ? "▶" : "‖";
+        // U+FE0E asks for the text triangle; without it iOS draws the ▶ emoji.
+        glyph.textContent = playing ? "▶︎" : "‖";
         time.textContent = fmt(audio.currentTime);
         seek.hidden = false;
         const pct = progressPct();

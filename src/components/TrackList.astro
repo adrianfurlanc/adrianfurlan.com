@@ -92,13 +92,16 @@ const t = ui[localeOf(Astro)];
       padding-bottom: 10px;
     }
 
+    /* Same size as "The Timeless EP" above; see tokens.css. */
     .heading {
-      font-size: 24px;
+      font-size: var(--hero-title-size);
       line-height: 1.2;
     }
 
+    /* Same size as the About page's grey credits on phones. */
     .note {
       margin-top: 14px;
+      font-size: 18px;
     }
   }
 </style>

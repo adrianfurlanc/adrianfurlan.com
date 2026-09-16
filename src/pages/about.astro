@@ -144,9 +144,14 @@ const lineup = names.map((name, i) => ({ name, role: t.about.roles[i] }));
     }
 
     .title {
-      font-size: 34px;
+      font-size: 36px;
       line-height: 1.2;
       letter-spacing: -0.015em;
+    }
+
+    /* Reading text is 4px larger on phones than the design's 17px. */
+    .prose {
+      font-size: 21px;
     }
 
     .rule {
@@ -158,7 +163,7 @@ const lineup = names.map((name, i) => ({ name, role: t.about.roles[i] }));
     }
 
     .band-name {
-      font-size: 24px;
+      font-size: 26px;
     }
 
     .lineup {
@@ -167,11 +172,11 @@ const lineup = names.map((name, i) => ({ name, role: t.about.roles[i] }));
     }
 
     .member-name {
-      font-size: var(--body-md-size);
+      font-size: 21px;
     }
 
     .credits {
-      font-size: var(--body-sm-size);
+      font-size: 18px;
     }
 
     .lineup + .credits {

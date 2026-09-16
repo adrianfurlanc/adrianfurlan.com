@@ -406,14 +406,17 @@ const t = ui[localeOf(Astro)];
       padding: 28px 20px 0;
     }
 
+    /* Page titles are 36px on phones, like "Sobre mí" on the About page. */
     .title {
-      font-size: var(--headline-sm-size);
+      font-size: 36px;
       line-height: 1.2;
       letter-spacing: var(--headline-sm-ls);
     }
 
+    /* Same reading size as the rest of the site's paragraphs on phones. */
     .lede {
       margin: 14px 0 24px;
+      font-size: 21px;
     }
 
     .form {

@@ -90,8 +90,9 @@ const labels = player[localeOf(Astro)];
     padding: 12px 16px;
   }
 
+  /* Shoal, the design system's "surface-live": used here and nowhere else. */
   .row[data-state="playing"] {
-    background-color: var(--light-blue);
+    background-color: var(--surface-live);
   }
 
   .row[data-state="paused"] {
@@ -297,8 +298,10 @@ const labels = player[localeOf(Astro)];
       display: block;
     }
 
+    /* 4px above the phones' body-lg (21px), so the names stand out from the
+       21px intro paragraph above the list. */
     .title {
-      font-size: var(--body-lg-size);
+      font-size: 25px;
     }
 
     .meta {

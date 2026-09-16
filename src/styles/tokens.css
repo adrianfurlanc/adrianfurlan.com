@@ -127,3 +127,30 @@
   --transition-state: 120ms ease-out;
   --transition-wash: 160ms ease-out;
 }
+
+/* Phones read every text size 2px larger than the design. Sizes written as
+   plain numbers in a component get the same +2px in that component. */
+@media (width < 720px) {
+  :root {
+    --display-size: 82px;
+    --headline-lg-size: 52px;
+    --headline-md-size: 40px;
+    --headline-sm-size: 30px;
+    --track-title-size: 23px;
+    --body-lg-size: 21px;
+    --body-md-size: 19px;
+    --body-sm-size: 16px;
+    --label-caps-size: 13px;
+    --label-md-size: 15px;
+    --data-time-size: 15px;
+    --data-catalog-size: 14px;
+    --caption-size: 14px;
+
+    /* Not in DESIGN.md: the homepage's "The Timeless EP" on phones, as large as
+       fits on one line beside the cover. The column is the screen minus 180px
+       (margins, cover, gap) and that title is about 6.96 times as wide as its
+       font size: 28px at 375px, 37px at 440px. The homepage's section
+       headings use it too, so they always match the title. */
+    --hero-title-size: min(calc(14.3vw - 25.8px), 52px);
+  }
+}

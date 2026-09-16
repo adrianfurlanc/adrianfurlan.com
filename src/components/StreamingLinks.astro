@@ -175,8 +175,9 @@ const shown = platforms.filter((platform) => platform.href);
       padding-bottom: 10px;
     }
 
+    /* Same size as "The Timeless EP" above; see tokens.css. */
     .heading {
-      font-size: 24px;
+      font-size: var(--hero-title-size);
       line-height: 1.2;
     }
 
@@ -205,9 +206,11 @@ const shown = platforms.filter((platform) => platform.href);
       height: 20px;
     }
 
+    /* 4px above the phones' body-md (19px), so the names stand out from the
+       21px text elsewhere on the page. */
     .name {
       margin-top: 0;
-      font-size: var(--body-md-size);
+      font-size: 23px;
     }
 
     .note {

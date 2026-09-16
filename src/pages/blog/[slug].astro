@@ -350,16 +350,17 @@ const readTime = Math.max(1, Math.ceil(words / 200));
     transition: color var(--transition-state);
   }
 
-  .all-posts-link:hover {
-    color: var(--title-hover);
-  }
-
   .arrow {
     margin-right: var(--space-sm);
     flex: none;
   }
 
   @media (hover: hover) and (width >= 720px) {
+    /* Phones skip the green: a tap would flash it before the page changes. */
+    .all-posts-link:hover {
+      color: var(--title-hover);
+    }
+
     .figure:hover {
       transform: scale(1.015);
     }
@@ -384,8 +385,9 @@ const readTime = Math.max(1, Math.ceil(words / 200));
       padding-top: var(--gutter);
     }
 
+    /* Page titles are 36px on phones, like "Sobre mí" on the About page. */
     .title {
-      font-size: 30px;
+      font-size: 36px;
       line-height: 1.15;
     }
 
@@ -456,9 +458,9 @@ const readTime = Math.max(1, Math.ceil(words / 200));
   }
 
   @media (width < 720px) {
+    /* Same reading size and line spacing as the About paragraphs on phones. */
     .post-body p {
-      font-size: var(--body-md-size);
-      line-height: var(--body-md-lh);
+      font-size: 21px;
     }
   }
 </style>

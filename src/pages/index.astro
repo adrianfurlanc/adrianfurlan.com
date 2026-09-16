@@ -152,10 +152,14 @@ const t = ui[locale];
       padding: 28px 20px 0;
     }
 
+    /* The two 1fr rows share the cover's spare height equally, so the label
+       and title sit together as one block, centred beside the cover. */
     .hero {
       grid-template:
+        "cover ." 1fr
         "cover label" auto
         "cover title" auto
+        "cover ." 1fr
         "lede lede" auto
         "meta meta" auto
         / 120px 1fr;
@@ -167,13 +171,16 @@ const t = ui[locale];
       height: 120px;
     }
 
+    /* As large as fits on one line beside the cover; see tokens.css. */
     .title {
-      margin-top: 12px;
-      font-size: var(--headline-sm-size);
+      margin-top: 4px;
+      font-size: var(--hero-title-size);
     }
 
+    /* Same reading size as the About page's paragraphs on phones. */
     .lede {
       margin-top: 22px;
+      font-size: 21px;
     }
 
     .release-meta {

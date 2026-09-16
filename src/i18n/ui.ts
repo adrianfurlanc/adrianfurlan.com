@@ -60,12 +60,13 @@ const en = {
   },
   blog: {
     title: "Blog",
-    lede: "Notes on the record, the band, the road.",
+    lede: "Notes on the band, the record and other interesting topics",
     latest: "Latest post",
     read: "Read",
     earlier: "Earlier posts",
     pagination: "Pagination",
-    // "Previous" in two pieces: phones show only the first.
+    // "Previous" in two pieces: phones show only the first. Spanish keeps the
+    // whole word on phones ("Ant" read badly) and shows only the current page number.
     prev: "Prev",
     prevTail: "ious",
     next: "Next",
@@ -138,13 +139,13 @@ const es: Dictionary = {
   },
   blog: {
     title: "Blog",
-    lede: "Notas sobre el disco, la banda y la carretera.",
+    lede: "Notas sobre la banda, el disco y otros temas de interés.",
     latest: "Última entrada",
     read: "Leer",
     earlier: "Entradas anteriores",
     pagination: "Paginación",
-    prev: "Ant",
-    prevTail: "erior",
+    prev: "Anterior",
+    prevTail: "",
     next: "Siguiente",
     pageOf: (n, total) => `Página ${n} de ${total}`,
     pageNumber: (n) => `Página ${n}`,

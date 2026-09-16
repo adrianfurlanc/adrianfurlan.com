@@ -206,6 +206,14 @@ const here = pathWithoutLocale(Astro.url.pathname);
   }
 
   @media (width < 720px) {
+    /* Pinned to the top of the phone screen so the menu is always a tap
+       away, however far down the page the reader has scrolled. */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
     .bar {
       padding: 14px 20px 16px;
       gap: 0 14px;
@@ -237,7 +245,7 @@ const here = pathWithoutLocale(Astro.url.pathname);
       align-items: center;
       height: 44px;
       flex: 1;
-      font-size: 22px;
+      font-size: 24px;
       line-height: 1;
       order: 2;
     }
@@ -266,17 +274,18 @@ const here = pathWithoutLocale(Astro.url.pathname);
       width: 100%;
       padding: 15px 0;
       border-bottom: 1px solid var(--deep-water);
+      font-size: 15px;
+      transition: none;
     }
 
     .nav-link:last-child {
       border-bottom: 0;
     }
 
-    .nav-link:hover {
-      color: var(--light-blue);
-    }
-
-    .nav-link[aria-current="page"]:hover {
+    /* A tap counts as hover on phones: the link lights up at once, like the
+       blog's page numbers, so the reader sees it registered. */
+    .nav-link:hover,
+    .nav-link:active {
       color: var(--sleeve);
     }
   }
