@@ -31,6 +31,18 @@ const locale = localeOf(Astro);
       rel="stylesheet"
     />
     {
+      /* The owner's opt-out from the play counts: visiting any page with ?nocount writes the note Umami checks before sending anything, so that browser is never counted; ?count removes it. is:inline keeps the tag as written so it runs before the tracker below. */
+    }
+    <script is:inline>
+      try {
+        const query = new URLSearchParams(location.search);
+        if (query.has("nocount")) localStorage.setItem("umami.disabled", "1");
+        if (query.has("count")) localStorage.removeItem("umami.disabled");
+      } catch {
+        /* private window or blocked storage: nothing to remember */
+      }
+    </script>
+    {
       /* Umami's tracker, only when a website ID is set. is:inline keeps the tag as written so the browser loads it straight from Umami. */
     }
     {
