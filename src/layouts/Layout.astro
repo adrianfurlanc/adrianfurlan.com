@@ -2,6 +2,7 @@
 import { ClientRouter } from "astro:transitions";
 import PlayerBar from "../components/PlayerBar.astro";
 import { localeOf } from "../i18n";
+import { analytics } from "../data/analytics";
 import "../styles/tokens.css";
 import "../styles/global.css";
 
@@ -29,6 +30,19 @@ const locale = localeOf(Astro);
       href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,700&family=Archivo:wght@400;700&family=Archivo+Narrow:wght@700&display=swap"
       rel="stylesheet"
     />
+    {
+      /* Umami's tracker, only when a website ID is set. is:inline keeps the tag as written so the browser loads it straight from Umami. */
+    }
+    {
+      analytics.websiteId && (
+        <script
+          is:inline
+          defer
+          src={analytics.script}
+          data-website-id={analytics.websiteId}
+        />
+      )
+    }
     <title>{title}</title>
     {
       /* Client-side navigation so the player bar (and its audio) survives page changes. Pages cross-fade with Astro\'s default. */

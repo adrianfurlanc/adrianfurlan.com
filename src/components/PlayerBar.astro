@@ -60,6 +60,13 @@ const labels = player[localeOf(Astro)];
     release: string;
   }
 
+  // The global Umami's tracker creates when Layout.astro loads it.
+  declare global {
+    interface Window {
+      umami?: { track: (name: string, data?: Record<string, string>) => void };
+    }
+  }
+
   const bar = document.querySelector<HTMLElement>("[data-player]");
 
   if (bar) {
@@ -73,6 +80,17 @@ const labels = player[localeOf(Astro)];
 
     let playlist: Track[] = [];
     let current: Track | null = null;
+
+    // Play counting: seconds of the current track actually heard, the last
+    // position seen (to measure them), and whether its "listen" was reported.
+    let heard = 0;
+    let lastTime = 0;
+    let listened = false;
+
+    // Reports a play-count event to Umami when its script is loaded; does
+    // nothing otherwise (no website ID, blocked by the browser, not yet loaded).
+    const report = (event: string, track: Track) =>
+      window.umami?.track(event, { track: track.slug, title: track.title });
 
     const fmt = (seconds: number) => {
       const s = Math.max(0, Math.floor(seconds));
@@ -173,6 +191,9 @@ const labels = player[localeOf(Astro)];
       current = track;
       audio.src = track.src;
       audio.currentTime = 0;
+      heard = 0;
+      lastTime = 0;
+      listened = false;
     };
 
     const playTrack = (track: Track) => {
@@ -246,7 +267,18 @@ const labels = player[localeOf(Astro)];
       paint();
     });
     audio.addEventListener("pause", paint);
-    audio.addEventListener("timeupdate", paint);
+    audio.addEventListener("timeupdate", () => {
+      // Only small forward steps count as listening, so a seek (one big jump)
+      // does not. "listen" is sent once the track has been heard for 30 s.
+      const delta = audio.currentTime - lastTime;
+      lastTime = audio.currentTime;
+      if (delta > 0 && delta < 2) heard += delta;
+      if (!listened && heard >= 30 && current) {
+        listened = true;
+        report("listen", current);
+      }
+      paint();
+    });
     audio.addEventListener("error", () => {
       if (bar.hidden) current = null;
       paint();
@@ -272,6 +304,14 @@ const labels = player[localeOf(Astro)];
         const rowButton = row.querySelector(".transport") as HTMLElement;
         const seek = row.querySelector(".seek") as HTMLElement;
         rowButton.addEventListener("click", () => {
+          // A press that starts the track from the beginning is a "play":
+          // a new track, or replaying one that finished (the player rewinds
+          // it to 0 and keeps it current). Pause and resume are not.
+          const starting =
+            !current ||
+            current.slug !== row.dataset.slug ||
+            (audio.paused && audio.currentTime === 0);
+          if (starting) report("play", trackFromRow(row));
           if (current && current.slug === row.dataset.slug) {
             toggle();
           } else {
