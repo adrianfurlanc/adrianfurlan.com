@@ -205,22 +205,31 @@ const here = pathWithoutLocale(Astro.url.pathname);
     display: none;
   }
 
-  /* Tablets: the links look the same, but an invisible layer around each one
-     makes it about 44px tall, big enough for a finger. */
+  /* Tablets: the nav links look the same, but an invisible layer around each
+     one makes it about 44px tall, big enough for a finger. (On phones they are
+     already full-width menu rows.) */
   @media (pointer: coarse) and (width >= 720px) {
-    .nav-link,
-    .lang-option {
+    .nav-link {
       position: relative;
     }
 
-    .nav-link::after,
-    .lang-option::after {
+    .nav-link::after {
       content: "";
       position: absolute;
       inset: -14px -9px;
     }
+  }
+
+  /* Touch screens of any size: the same for the ES/EN toggle, which is small
+     on phones and tablets alike. */
+  @media (pointer: coarse) {
+    .lang-option {
+      position: relative;
+    }
 
     .lang-option::after {
+      content: "";
+      position: absolute;
       inset: -9px 0;
     }
 
