@@ -205,6 +205,40 @@ const here = pathWithoutLocale(Astro.url.pathname);
     display: none;
   }
 
+  /* Tablets: the links look the same, but an invisible layer around each one
+     makes it about 44px tall, big enough for a finger. */
+  @media (pointer: coarse) and (width >= 720px) {
+    .nav-link,
+    .lang-option {
+      position: relative;
+    }
+
+    .nav-link::after,
+    .lang-option::after {
+      content: "";
+      position: absolute;
+      inset: -14px -9px;
+    }
+
+    .lang-option::after {
+      inset: -9px 0;
+    }
+
+    /* Let the ES/EN tap layers reach outside the toggle's border; the active
+       option keeps the rounded corners the clipping used to give it. */
+    .lang {
+      overflow: visible;
+    }
+
+    .lang-option:first-child {
+      border-radius: 1px 0 0 1px;
+    }
+
+    .lang-option:last-child {
+      border-radius: 0 1px 1px 0;
+    }
+  }
+
   @media (width < 720px) {
     /* Pinned to the top of the phone screen so the menu is always a tap
        away, however far down the page the reader has scrolled. */

@@ -166,6 +166,13 @@ const shown = platforms.filter((platform) => platform.href);
     }
   }
 
+  /* Touch screens can't hover, so the brand colour shows from the start. */
+  @media (hover: none) {
+    .card {
+      border-color: var(--brand, var(--deep-water));
+    }
+  }
+
   @media (width < 720px) {
     .listen {
       margin-top: 36px;

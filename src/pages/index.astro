@@ -94,11 +94,13 @@ const t = ui[locale];
     margin: 0;
   }
 
+  /* The title shrinks on narrow tablets so it still fits on one line beside
+     the 280px cover; it is back to the full 52px from about 820px wide. */
   .title {
     grid-area: title;
     margin: var(--space-md) 0 0;
     font-family: var(--font-serif);
-    font-size: 52px;
+    font-size: min(52px, calc(13.4vw - 58px));
     font-weight: var(--weight-bold);
     line-height: 1;
     letter-spacing: var(--display-ls);
